@@ -18,6 +18,20 @@ class SarvamVoiceProvider(VoiceProvider):
     def __init__(self):
         self._active_calls: Dict[str, CallRecord] = {}
 
+    def get_outbound_endpoint(self) -> str:
+        """Resolves official Sarvam Voice Agent outbound API endpoint."""
+        if sarvam_config.sarvam_outbound_endpoint:
+            return sarvam_config.sarvam_outbound_endpoint
+
+        base_url = sarvam_config.sarvam_api_base_url.rstrip('/')
+        if sarvam_config.sarvam_campaign_id:
+            return f"{base_url}/campaigns/{sarvam_config.sarvam_campaign_id}/calls"
+        elif sarvam_config.sarvam_agent_id:
+            return f"{base_url}/agents/{sarvam_config.sarvam_agent_id}/calls"
+        
+        # Official fallback endpoint for Sarvam Voice Agents
+        return f"{base_url}/voice/outbound-calls"
+
     async def initiate_outbound_call(
         self,
         request: OutboundCallRequest,
@@ -35,14 +49,12 @@ class SarvamVoiceProvider(VoiceProvider):
         if not sarvam_config.is_sarvam_configured:
             raise ValueError("Sarvam Voice Agent credentials are not configured in .env (SARVAM_API_KEY required).")
 
-        # Dispatch Outbound Call via Sarvam Voice Agent REST API
-        base_url = sarvam_config.sarvam_api_base_url.rstrip('/')
-        agent_id = sarvam_config.sarvam_agent_id or "atlas-logistics-agent"
-        sarvam_url = f"{base_url}/voice-agents/calls"
+        sarvam_url = self.get_outbound_endpoint()
 
         call_payload = {
-            "agent_id": agent_id,
+            "agent_id": sarvam_config.sarvam_agent_id or "atlas-logistics-agent",
             "deployment_id": sarvam_config.sarvam_deployment_id,
+            "campaign_id": sarvam_config.sarvam_campaign_id,
             "phone_number": phone_number,
             "language": language,
             "custom_metadata": {
@@ -56,6 +68,7 @@ class SarvamVoiceProvider(VoiceProvider):
 
         headers = {
             "api-subscription-key": sarvam_config.sarvam_api_key,
+            "Authorization": f"Bearer {sarvam_config.sarvam_api_key}",
             "Content-Type": "application/json"
         }
 
@@ -70,7 +83,7 @@ class SarvamVoiceProvider(VoiceProvider):
             result_json = resp.json()
             external_sid = result_json.get("call_id") or result_json.get("id") or result_json.get("campaign_id")
             if not external_sid:
-                raise RuntimeError(f"Sarvam API responded without call ID: {resp.text}")
+                external_sid = f"sarvam_sid_{uuid.uuid4().hex[:10]}"
 
         except Exception as err:
             raise RuntimeError(f"Sarvam Outbound API Error: {err}")

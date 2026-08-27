@@ -11,6 +11,8 @@ class SarvamConfig(BaseModel):
     sarvam_api_key: str = os.getenv("SARVAM_API_KEY", "")
     sarvam_agent_id: str = os.getenv("SARVAM_AGENT_ID", "")
     sarvam_deployment_id: str = os.getenv("SARVAM_DEPLOYMENT_ID", "")
+    sarvam_campaign_id: str = os.getenv("SARVAM_CAMPAIGN_ID", "")
+    sarvam_outbound_endpoint: str = os.getenv("SARVAM_OUTBOUND_ENDPOINT", "")
     sarvam_api_base_url: str = os.getenv("SARVAM_API_BASE_URL", "https://api.sarvam.ai")
     sarvam_default_language: str = os.getenv("SARVAM_DEFAULT_LANGUAGE", "hi-IN")
     webhook_base_url: str = os.getenv("SARVAM_WEBHOOK_BASE_URL", os.getenv("VOICE_WEBHOOK_BASE_URL", "http://127.0.0.1:8000"))
