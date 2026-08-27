@@ -107,6 +107,27 @@ class ToolExecutor:
         reason = str(arguments.get("reason", "LOADING_DELAY")).upper().strip()
         event_id = f"evt_{uuid.uuid4().hex[:8]}"
 
+        tool_call_id = arguments.get("tool_call_id")
+        if db and tool_call_id:
+            existing_events = await crud.get_events(db, limit=1000)
+            for evt in existing_events:
+                p_json = evt.payload_json
+                if isinstance(p_json, str):
+                    try:
+                        p_json = json.loads(p_json)
+                    except Exception:
+                        p_json = {}
+                if isinstance(p_json, dict) and p_json.get("tool_call_id") == tool_call_id:
+                    return {
+                        "success": True,
+                        "event_id": evt.id,
+                        "event_type": evt.event_type,
+                        "lorry_id": evt.lorry_id,
+                        "delay_minutes": p_json.get("delay_minutes", delay_minutes),
+                        "reason": p_json.get("reason", reason),
+                        "message": f"Recorded a {delay_minutes}-minute delay for Lorry {lorry_id} ({reason})."
+                    }
+
         payload = {
             "event_id": event_id,
             "event_type": EventType.DRIVER_DELAY_REPORTED.value,
@@ -116,7 +137,8 @@ class ToolExecutor:
             "payload_json": {
                 "delay_minutes": delay_minutes,
                 "reason": reason,
-                "reported_via": "ATLAS_PSTN_CALL"
+                "reported_via": "ATLAS_PSTN_CALL",
+                "tool_call_id": tool_call_id
             },
             "resolution_status": "PENDING"
         }

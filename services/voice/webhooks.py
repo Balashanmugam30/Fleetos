@@ -9,6 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from services.voice.models import CallStatus
 from services.agent.tool_executor import tool_executor
 
+_EXECUTED_TOOL_CALLS: Dict[str, Dict[str, Any]] = {}
+
 class VoiceWebhookNormalizer:
     """Normalizes Vapi webhook callbacks into internal Fleetos events and executes tool calls."""
 
@@ -21,6 +23,7 @@ class VoiceWebhookNormalizer:
             tool_calls = payload.get("message", {}).get("toolCalls", [])
             results = []
             for tool_call in tool_calls:
+                tool_call_id = tool_call.get("id")
                 call_func = tool_call.get("function", {})
                 func_name = call_func.get("name", "")
                 func_args = call_func.get("arguments", {})
@@ -30,9 +33,24 @@ class VoiceWebhookNormalizer:
                     except Exception:
                         func_args = {}
 
+                # Idempotency Check: Return cached result if same toolCallId is replayed
+                if tool_call_id and tool_call_id in _EXECUTED_TOOL_CALLS:
+                    cached_res = _EXECUTED_TOOL_CALLS[tool_call_id]
+                    results.append({
+                        "toolCallId": tool_call_id,
+                        "result": json.dumps(cached_res)
+                    })
+                    continue
+
+                if tool_call_id and isinstance(func_args, dict):
+                    func_args["tool_call_id"] = tool_call_id
+
                 tool_result = await tool_executor.execute_tool(func_name, func_args, db)
+                if tool_call_id:
+                    _EXECUTED_TOOL_CALLS[tool_call_id] = tool_result
+
                 results.append({
-                    "toolCallId": tool_call.get("id"),
+                    "toolCallId": tool_call_id,
                     "result": json.dumps(tool_result)
                 })
 
