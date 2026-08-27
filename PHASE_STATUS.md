@@ -1,48 +1,51 @@
 # FLEETOS PHASE EXECUTION GOVERNANCE & STATUS TRACKER
 
 Product Name: **FLEETOS** (Agentic Multimodal Fleet Intelligence Platform)  
-Current Master Phase: **PHASE 2 (Database, Persistence Layer & CRUD APIs)**  
-Phase 2 Status: **COMPLETED & PUSHED TO GITHUB**
+Current Master Phase: **PHASE 3 (Deterministic Multi-Lorry Optimization Engine)**  
+Phase 3 Status: **COMPLETED & PUSHED TO GITHUB**
 
 ---
 
-## 1. Phase 2 Verification Checklist Matrix
+## 1. Phase 3 Verification Checklist Matrix
 
-- [x] Terminology updated across documentation to **Google OR-Tools Routing Solver / RoutingModel**.
-- [x] Database persistence layer implemented via SQLAlchemy 2.x async ORM (`database.py`, `models.py`).
-- [x] Support for both PostgreSQL (`asyncpg`) and SQLite (`aiosqlite`) engine configurations.
-- [x] 10 canonical tables created (`drivers`, `lorries`, `shipments`, `assignments`, `routes`, `route_stops`, `events`, `calls`, `optimization_runs`, `tracking_positions`).
-- [x] Canonical demo seed dataset (Lorries L01-L05, Drivers D01-D05, Shipments S01-S12) loaded via `scripts/seed_database.py`.
-- [x] FastAPI REST CRUD APIs implemented under `/api/v1/` for all entities.
-- [x] DB Health endpoint `GET /api/v1/health/db` implemented and verified.
-- [x] Pydantic & SQLAlchemy server-side validation rules enforced (positive weight/volume, coordinate bounds).
-- [x] Shipment status transition state machine rules enforced (`crud.py`).
-- [x] Web Control Tower pages (`/fleet`, `/shipments`, `/dashboard`) bound directly to backend database API.
-- [x] Automated test suite passed 6/6 tests (`services/api/tests/test_database.py`).
-- [x] Next.js production build (`pnpm --filter web build`) compiled cleanly into dynamic/static pages.
-- [x] Security audit completed (no credentials or database keys committed).
-- [x] Git commit created (`feat: add Fleetos database and persistence layer`).
+- [x] Terminology locked: **Google OR-Tools Routing Solver / RoutingModel** (`RoutingIndexManager`, `RoutingModel`).
+- [x] Normalized solver data models created (`services/optimizer/models.py`).
+- [x] Distance & duration matrix provider created (`services/optimizer/matrix.py`).
+- [x] Pre-flight cheap feasibility diagnostics created (`services/optimizer/feasibility.py`).
+- [x] Vehicle fuel consumption (`distance / fuel_efficiency_km_l`) and operational cost modeling created (`services/optimizer/cost.py`).
+- [x] Structured JSON explanation generator created (`services/optimizer/explain.py`).
+- [x] Independent post-solution validator created (`services/optimizer/validation.py`).
+- [x] OR-Tools `RoutingModel` VRP solver engine implemented (`services/optimizer/routing.py`).
+- [x] Weight capacity dimension callback & peak load tracking verified.
+- [x] Volume capacity dimension callback & peak load tracking verified.
+- [x] Pickup-before-delivery & delivery deadline time window constraints verified.
+- [x] Nearest-Lorry Trap resolved (L05 @ 5.2 km/L selected over L01 @ 3.5 km/L for lower total operating cost).
+- [x] Unassigned shipments receive structured rejection reasons (`WEIGHT_CAPACITY_EXCEEDED`, `VOLUME_CAPACITY_EXCEEDED`, `NO_AVAILABLE_DRIVER`, `DEADLINE_INFEASIBLE`).
+- [x] Optimization REST API endpoint `POST /api/v1/optimization/run` and persistence to `optimization_runs` verified.
+- [x] Web Control Tower page `/optimization` bound to backend solver API with bright enterprise UI.
+- [x] Automated test suite passed 11/11 tests (`test_database.py` and `test_optimizer.py`).
+- [x] Next.js production build (`pnpm --filter web build`) compiled with 0 errors.
+- [x] Git commit created (`feat: implement Fleetos routing optimization engine`).
 - [x] Pushed commit to remote repository `origin/main`.
-- [x] Remote commit verified via `git ls-remote origin refs/heads/main`.
+- [x] Remote commit SHA verified via `git ls-remote origin refs/heads/main`.
 
 ---
 
 ## 2. Component Readiness Summary Matrix
 
-| Component | Status | Evidence | Risk Level | Next Action for Phase 3 |
+| Component | Status | Evidence | Risk Level | Next Action for Phase 4 |
 | :--- | :--- | :--- | :--- | :--- |
-| **Database Persistence** | `VERIFIED` | 10 tables initialized & seeded cleanly | `NONE` | Serve data to OR-Tools solver |
-| **FastAPI REST CRUD** | `VERIFIED` | 10 router modules active under `/api/v1/` | `NONE` | Provide solver input endpoints |
-| **Web UI Real Data** | `VERIFIED` | Next.js `/fleet` & `/shipments` render DB data | `NONE` | Add solver control UI |
-| **Optimization Boundary** | `VERIFIED` | OR-Tools Routing Solver interface ready | `LOW` | Implement RoutingModel logic |
+| **Optimization Engine** | `VERIFIED` | OR-Tools RoutingModel solving CVRP-TW | `NONE` | Provide route inputs to live tracker |
+| **Pre-Flight Diagnostics** | `VERIFIED` | Catches capacity/driver/deadline infeasibility | `NONE` | Provide reasons to ATLAS agent |
+| **Cost & Fuel Modeling** | `VERIFIED` | Vehicle-specific fuel efficiency (km/L) | `NONE` | Feed metrics to dashboard UI |
+| **Web Control Tower UI** | `VERIFIED` | Interactive `/optimization` page | `NONE` | Integrate live tracking map |
 | **GitHub Integration** | `VERIFIED` | Pushed to `https://github.com/Balashanmugam30/Fleetos` | `NONE` | Maintain main branch CI readiness |
 
 ---
 
-## 3. Next Phase Prerequisites (Phase 3 Target)
+## 3. Next Phase Prerequisites (Phase 4 Target)
 
-Phase 3 will establish:
-1. Google OR-Tools Routing Solver / RoutingModel VRP implementation (`services/optimizer/solver.py`).
-2. Distance & travel-time matrix computation engine (Mapbox Directions API / OSRM + Haversine fallback matrix).
-3. Constraint enforcement: Lorry weight limits, volume capacities, driver availabilities, delivery deadlines (time windows), fuel efficiency optimization (km/L), and priority penalties.
-4. FastAPI optimization endpoint `POST /api/v1/optimization/solve`.
+Phase 4 will establish:
+1. Real-time fleet tracking engine (simulated GPS position generator, route progress tracking).
+2. Live vehicle movement server-sent events / WebSockets feed.
+3. Interactive dashboard map view with live lorry markers and ETA countdowns.

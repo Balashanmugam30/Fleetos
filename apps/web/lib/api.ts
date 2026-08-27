@@ -1,6 +1,6 @@
 /**
  * Fleetos API Client
- * Connects Web Dashboard UI to FastAPI REST Backend Services
+ * Connects Web Dashboard UI to FastAPI REST Backend Services & OR-Tools Optimization Engine
  */
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
@@ -99,5 +99,19 @@ export async function fetchEvents(): Promise<OperationalEvent[]> {
   } catch (err) {
     console.error("Error fetching events:", err);
     return [];
+  }
+}
+
+export async function triggerOptimization(triggerReason = "MANUAL_REOPTIMIZE") {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/v1/optimization/run?trigger_reason=${encodeURIComponent(triggerReason)}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }
+    });
+    if (!res.ok) throw new Error("Optimization solver call failed");
+    return await res.json();
+  } catch (err) {
+    console.error("Optimization error:", err);
+    throw err;
   }
 }

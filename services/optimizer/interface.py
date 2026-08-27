@@ -1,31 +1,17 @@
 """
 Fleetos Deterministic Optimization Engine Interface
-Module Boundary: services/optimizer
+Module Boundary: services/optimizer/interface.py
 """
 
 from typing import List, Dict, Any, Optional
-from pydantic import BaseModel
-
-class OptimizationRequest(BaseModel):
-    lorries: List[Dict[str, Any]]
-    shipments: List[Dict[str, Any]]
-    driver_availabilities: Dict[str, str]
-    trigger_reason: str
-
-class OptimizationResult(BaseModel):
-    status: str  # 'OPTIMAL' | 'FEASIBLE' | 'INFEASIBLE'
-    assignments: List[Dict[str, Any]]
-    routes: List[Dict[str, Any]]
-    total_cost: float
-    total_fuel_liters: float
-    deadline_violations: int
-    unassigned_shipments: List[Dict[str, Any]]
+from services.optimizer.models import OptimizationInput, OptimizationResult
+from services.optimizer.service import OptimizationService
 
 class OptimizerInterface:
     """
-    Abstract interface for Google OR-Tools VRP Solver.
+    Interface for Google OR-Tools Routing Solver / RoutingModel Engine.
     The LLM (ATLAS) NEVER formulates routes or solves VRP math.
     This deterministic solver engine is authoritative.
     """
-    def solve(self, request: OptimizationRequest) -> OptimizationResult:
-        raise NotImplementedError("Solver module will be implemented in Phase 3.")
+    def solve(self, input_data: OptimizationInput, trigger_reason: str = "MANUAL_REOPTIMIZE") -> OptimizationResult:
+        return OptimizationService.run_optimization(input_data, trigger_reason=trigger_reason)
