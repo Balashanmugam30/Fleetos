@@ -7,14 +7,27 @@
   --foreground: #0f172a;
 }
 
-body {
+/* Baseline Reset & Typography Enforcements */
+html, body {
   color: var(--foreground);
-  background: var(--background);
+  background-color: var(--background);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Bright Enterprise Logistics Card Styling */
+/* Prevent Unstyled Browser Defaults */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* Bright Enterprise Logistics Card System */
 .logistics-card {
   background-color: #ffffff;
   border: 1px solid #e2e8f0;
