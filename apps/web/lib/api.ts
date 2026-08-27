@@ -200,10 +200,13 @@ export interface VoiceHealth {
   provider: string;
   mode: string;
   configured: boolean;
+  sarvam_configured?: boolean;
   twilio_configured?: boolean;
   openai_configured?: boolean;
   public_webhook_configured?: boolean;
   websocket_configured?: boolean;
+  outbound_ready?: boolean;
+  tool_ready?: boolean;
   real_pstn_ready?: boolean;
   provider_reachable: boolean;
   real_pstn_verified: boolean;

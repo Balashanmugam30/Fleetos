@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { PhoneCall, ShieldCheck, ArrowRight } from "lucide-react";
+import { PhoneCall, ShieldCheck, ArrowRight, Globe } from "lucide-react";
 import { VoiceHealth, CallRecord, fetchVoiceHealth, initiateDriverCall, fetchCallRecords } from "@/lib/api";
 
 export function AtlasVoiceCard() {
@@ -56,16 +56,16 @@ export function AtlasVoiceCard() {
         <div className="flex justify-between items-center border-b border-slate-100 pb-3 mb-3">
           <div>
             <h3 className="text-base font-bold text-slate-900 flex items-center">
-              <PhoneCall className="w-4 h-4 mr-2 text-brand-600" />
-              ATLAS — TWILIO VOICE
+              <Globe className="w-4 h-4 mr-2 text-brand-600" />
+              ATLAS — SARVAM VOICE AGENT
             </h3>
-            <p className="text-xs text-slate-500">Twilio ConversationRelay PSTN call dispatch & AI tool executor.</p>
+            <p className="text-xs text-slate-500">Sarvam Multilingual Indic AI & Twilio PSTN call dispatch.</p>
           </div>
 
           <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
             isRealMode ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-blue-50 text-blue-700 border border-blue-200"
           }`}>
-            {isRealMode ? "TWILIO REAL VOICE ACTIVE" : "DEMO TELEPHONY MODE"}
+            {isRealMode ? "SARVAM REAL VOICE ACTIVE" : "DEMO TELEPHONY MODE"}
           </span>
         </div>
 
@@ -110,7 +110,7 @@ export function AtlasVoiceCard() {
               <span className="text-brand-600">{latestCall.driver_id} ({latestCall.call_type})</span>
             </div>
             <div className="flex justify-between text-slate-500 text-[11px]">
-              <span>Status: {latestCall.status}</span>
+              <span>Provider: {latestCall.provider} | Status: {latestCall.status}</span>
               <span className="font-mono text-slate-400">{new Date(latestCall.created_at).toLocaleTimeString()}</span>
             </div>
           </div>

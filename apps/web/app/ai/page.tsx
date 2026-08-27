@@ -10,7 +10,7 @@ import {
   CallRecord,
   OperationalEvent
 } from "@/lib/api";
-import { PhoneCall, ShieldCheck, Play, Radio, Activity, Clock, CheckCircle2, AlertTriangle, User, Truck } from "lucide-react";
+import { PhoneCall, ShieldCheck, Globe, Activity, CheckCircle2, User, Truck } from "lucide-react";
 
 export default function AIPage() {
   const [health, setHealth] = useState<VoiceHealth | null>(null);
@@ -18,10 +18,10 @@ export default function AIPage() {
   const [events, setEvents] = useState<OperationalEvent[]>([]);
   const [selectedDriver, setSelectedDriver] = useState<string>("D03");
   const [selectedType, setSelectedType] = useState<string>("STATUS_CHECK");
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("AUTO");
   const [contextNotes, setContextNotes] = useState<string>("Routine status check on current load progression");
   const [calling, setCalling] = useState<boolean>(false);
   const [outcomeMessage, setOutcomeMessage] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
 
   const loadData = async () => {
     try {
@@ -38,8 +38,6 @@ export default function AIPage() {
       setEvents(eRes.filter(e => e.source === "ATLAS_VOICE" || e.event_type.includes("CALL") || e.event_type.includes("DELAY")));
     } catch (err) {
       console.error("Error loading ATLAS Voice Operations data:", err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -76,11 +74,12 @@ export default function AIPage() {
           <div className="inline-flex items-center space-x-2 px-3 py-1 bg-brand-50 border border-brand-200 text-brand-700 rounded-full text-xs font-semibold mb-2">
             <span>SEE → HEAR → THINK → OPTIMIZE → ACT → UPDATE</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            ATLAS Voice Agent Operations Center
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight flex items-center">
+            <Globe className="w-6 h-6 mr-2 text-brand-600" />
+            ATLAS — Sarvam Multilingual Voice Agent Operations Center
           </h1>
           <p className="text-sm text-slate-500">
-            PSTN telephone driver dispatch, Twilio ConversationRelay gateway, tool execution & state update logs.
+            Sarvam Indic AI Voice Agent, Twilio PSTN telephony, multilingual code-mixing & Fleetos tool execution.
           </p>
         </div>
 
@@ -89,7 +88,7 @@ export default function AIPage() {
             isRealMode ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-blue-50 text-blue-700 border-blue-200"
           }`}>
             <ShieldCheck className="w-4 h-4" />
-            <span>{isRealMode ? "TWILIO CONVERSATIONRELAY ACTIVE" : "DEMO TELEPHONY MODE"}</span>
+            <span>{isRealMode ? "SARVAM REAL VOICE ACTIVE" : "DEMO TELEPHONY MODE"}</span>
           </div>
         </div>
       </div>
@@ -100,18 +99,18 @@ export default function AIPage() {
           <div>
             <h3 className="text-base font-bold text-slate-900 flex items-center">
               <PhoneCall className="w-4 h-4 mr-2 text-brand-600" />
-              Dispatch Outbound Driver Telephony Call
+              Dispatch Outbound Multilingual Driver Call
             </h3>
-            <p className="text-xs text-slate-500">Initiate an automated ATLAS conversational call to a driver's mobile phone.</p>
+            <p className="text-xs text-slate-500">Initiate an automated Sarvam Indic conversational call to a driver's mobile phone.</p>
           </div>
 
           <span className="text-xs font-mono text-slate-500 bg-slate-100 px-2.5 py-1 rounded border border-slate-200">
-            Target Region: South India (+91)
+            Target Region: India (+91)
           </span>
         </div>
 
         <form onSubmit={handleDispatchCall} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">Target Driver</label>
               <select
@@ -124,6 +123,28 @@ export default function AIPage() {
                 <option value="D03">Driver D03 (Vikram Singh — Lorry L03)</option>
                 <option value="D04">Driver D04 (Arun Prasad — Lorry L04)</option>
                 <option value="D05">Driver D05 (Karthik R — Lorry L05)</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Indic Voice Language</label>
+              <select
+                value={selectedLanguage}
+                onChange={(e) => setSelectedLanguage(e.target.value)}
+                className="w-full bg-white border border-slate-300 rounded-lg p-2.5 text-xs font-semibold text-slate-900"
+              >
+                <option value="AUTO">AUTO (Automatic Detection / Code-Mixing)</option>
+                <option value="ta-IN">Tamil (தமிழ் / Tanglish)</option>
+                <option value="hi-IN">Hindi (हिंदी / Hinglish)</option>
+                <option value="en-IN">English (Indian Accent)</option>
+                <option value="te-IN">Telugu (తెలుగు)</option>
+                <option value="kn-IN">Kannada (ಕನ್ನಡ)</option>
+                <option value="ml-IN">Malayalam (മലയാളം)</option>
+                <option value="bn-IN">Bengali (বাংলা)</option>
+                <option value="mr-IN">Marathi (मराठी)</option>
+                <option value="gu-IN">Gujarati (ગુજરાતી)</option>
+                <option value="pa-IN">Punjabi (ਪੰਜਾਬੀ)</option>
+                <option value="or-IN">Odia (ଓଡ଼ିଆ)</option>
               </select>
             </div>
 
@@ -156,7 +177,7 @@ export default function AIPage() {
 
           <div className="flex justify-between items-center pt-2">
             <span className="text-xs text-slate-400 font-mono">
-              Provider Mode: {health?.mode || "DEMO"}
+              Active Provider: SARVAM VOICE ({health?.mode || "DEMO"})
             </span>
 
             <button

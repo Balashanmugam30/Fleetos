@@ -74,9 +74,11 @@ app.include_router(calls.router)
 app.include_router(optimization.router)
 app.include_router(tracking.router)
 from services.voice.conversation_relay import router as twilio_router
+from services.api.app.routers.sarvam_webhook import router as sarvam_router
 
 app.include_router(voice.router)
 app.include_router(twilio_router)
+app.include_router(sarvam_router)
 
 if __name__ == "__main__":
     import uvicorn

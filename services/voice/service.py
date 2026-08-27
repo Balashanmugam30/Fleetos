@@ -12,6 +12,8 @@ from services.voice.provider import VoiceProvider
 from services.voice.vapi import VapiVoiceProvider
 from services.voice.simulator import DemoVoiceProvider
 from services.voice.twilio_provider import TwilioConversationRelayProvider
+from services.voice.sarvam_provider import SarvamVoiceProvider
+from services.voice.sarvam_config import sarvam_config
 from services.voice.twilio_config import twilio_config
 from services.voice.config import voice_config
 from services.api.app import crud
@@ -25,9 +27,11 @@ class VoiceService:
 
     def get_provider(self, requested_provider: Optional[str] = None) -> VoiceProvider:
         prov_name = (requested_provider or voice_config.active_provider).lower()
-        if prov_name in ["twilio", "real"] and twilio_config.is_twilio_configured:
+        if prov_name in ["sarvam", "real"] and sarvam_config.is_sarvam_configured:
+            return SarvamVoiceProvider()
+        elif prov_name == "twilio" and twilio_config.is_twilio_configured:
             return TwilioConversationRelayProvider()
-        elif prov_name == "vapi" and voice_config.is_real_vapi_configured:
+        elif prov_name in ["vapi", "legacy-vapi"] and voice_config.is_real_vapi_configured:
             return VapiVoiceProvider()
         return DemoVoiceProvider()
 
@@ -62,7 +66,8 @@ class VoiceService:
             "driver_id": d_id,
             "lorry_id": lorry_id,
             "phone_number": phone_number,
-            "call_type": request.call_type.value
+            "call_type": request.call_type.value,
+            "language": getattr(request, "custom_variables", {}).get("language", sarvam_config.sarvam_default_language)
         }
 
         active_prov = self.get_provider(provider_name)
@@ -113,23 +118,26 @@ class VoiceService:
         return self._call_records.get(call_id)
 
     def get_health(self) -> VoiceHealthResponse:
-        is_twilio_ok = twilio_config.is_twilio_configured
-        is_openai_ok = twilio_config.is_openai_configured
-        is_real = twilio_config.is_real_pstn_ready
+        is_sarvam_ok = sarvam_config.is_sarvam_configured
+        is_twilio_ok = sarvam_config.is_twilio_configured
+        is_real = sarvam_config.is_real_pstn_ready
 
-        base_url = twilio_config.webhook_base_url.rstrip('/')
+        base_url = sarvam_config.webhook_base_url.rstrip('/')
         return VoiceHealthResponse(
-            provider="twilio" if is_twilio_ok else "demo",
+            provider="sarvam" if is_sarvam_ok else "demo",
             mode="REAL" if is_real else "DEMO",
             configured=is_real,
+            sarvam_configured=is_sarvam_ok,
             twilio_configured=is_twilio_ok,
-            openai_configured=is_openai_ok,
-            public_webhook_configured=twilio_config.is_public_webhook_configured,
+            openai_configured=bool(voice_config.is_openai_configured),
+            public_webhook_configured=sarvam_config.is_public_webhook_configured,
             websocket_configured=True,
+            outbound_ready=is_real,
+            tool_ready=True,
             real_pstn_ready=is_real,
             provider_reachable=True,
             real_pstn_verified=is_real,
-            webhook_url=f"{base_url}/api/v1/voice/twilio/connect"
+            webhook_url=f"{base_url}/api/v1/voice/sarvam/tools/report-delay"
         )
 
 voice_service = VoiceService()
