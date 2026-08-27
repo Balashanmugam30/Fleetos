@@ -1,7 +1,8 @@
 # Fleetos Sarvam Voice Agents & Twilio Telephony Setup Guide
 
 Product: **Fleetos** (Agentic Multimodal Fleet Intelligence Platform)  
-Voice Agent: **ATLAS**
+Voice Agent: **ATLAS**  
+Telephony Readiness: **REAL PSTN BLOCKED — requires a provisioned/importable telephony number.**
 
 ---
 
@@ -9,9 +10,18 @@ Voice Agent: **ATLAS**
 
 ### 1. Twilio Trial Account Inventory Limitation
 When testing with a Twilio trial account:
-- Twilio provides a **"Try Out Voice" sandbox test number** (e.g., `+17372212163`) which can dial verified recipient phone numbers (`+91...`).
-- However, querying Twilio's REST API endpoint `GET /2010-04-01/Accounts/{SID}/IncomingPhoneNumbers.json` returns an **empty array** (`{"incoming_phone_numbers": []}`) because trial sandbox numbers are shared sandbox pools, not provisioned `IncomingPhoneNumber` resources belonging exclusively to the account.
-- When Sarvam Voice Agents executes **BYO Twilio $\rightarrow$ Import Numbers**, Sarvam queries `IncomingPhoneNumbers.json`. Because 0 provisioned numbers exist, Sarvam displays **"No results found"**.
+- Twilio credentials: **VALID**
+- Twilio Try Out Voice: **WORKING**
+- Twilio provisioned `IncomingPhoneNumbers`: **0**
+- Sarvam Twilio connection: **CONNECTED**
+- Sarvam importable phone number: **NOT AVAILABLE**
+- Sarvam outbound campaign: **NOT VERIFIED**
+- Fleetos Sarvam tool endpoint: **WORKING**
+- `report_delay`: **WORKING**
+- `pytest`: **34 PASSED**
+- Next.js build: **PASSED**
+- `real_pstn_ready`: **FALSE**
+- Actual real Sarvam → Twilio → mobile call: **NOT VERIFIED**
 
 ---
 
@@ -57,4 +67,4 @@ When running in trial mode without a provisioned phone number, `GET /api/v1/voic
 }
 ```
 
-Fleetos safely runs in **Demo Telephony Mode**, allowing full operational simulation, tool execution, and Control Tower updates without making false claims of real PSTN readiness.
+Fleetos safely runs in **Demo Telephony Mode**, allowing full operational simulation, tool execution, and Control Tower updates without making unverified claims of real PSTN readiness.
