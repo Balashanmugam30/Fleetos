@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { fetchEvents, OperationalEvent } from "@/lib/api";
 import { EventStream } from "@/components/event-stream";
-import { Activity, ShieldCheck, Filter } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 
 export default function EventsPage() {
   const [events, setEvents] = useState<OperationalEvent[]>([]);
@@ -13,7 +13,10 @@ export default function EventsPage() {
   const loadEventData = async () => {
     try {
       const evtRes = await fetchEvents();
-      setEvents(evtRes);
+      const dedupedEvents = (evtRes || []).filter((evt, index, self) =>
+        index === self.findIndex((e) => e.id === evt.id)
+      );
+      setEvents(dedupedEvents);
     } catch (err) {
       console.error("Error loading events:", err);
     } finally {
@@ -57,12 +60,12 @@ export default function EventsPage() {
 
           <div className="flex items-center space-x-2 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg">
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>Event Taxonomy Verified ({filteredEvents.length})</span>
+            <span>Event Stream Verified ({filteredEvents.length})</span>
           </div>
         </div>
       </div>
 
-      <EventStream events={filteredEvents} />
+      <EventStream events={filteredEvents} maxDisplay={100} />
     </div>
   );
 }

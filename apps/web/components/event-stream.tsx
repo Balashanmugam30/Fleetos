@@ -2,18 +2,21 @@
 
 import React, { useState } from "react";
 import { OperationalEvent } from "@/lib/api";
-import { Activity, ChevronDown, ChevronUp, AlertTriangle, ShieldCheck, Clock } from "lucide-react";
+import { Activity, ChevronDown, ChevronUp, Clock } from "lucide-react";
 
 interface EventStreamProps {
   events: OperationalEvent[];
+  maxDisplay?: number;
 }
 
-export function EventStream({ events }: EventStreamProps) {
+export function EventStream({ events, maxDisplay = 10 }: EventStreamProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const toggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
   };
+
+  const displayedEvents = events.slice(0, maxDisplay);
 
   return (
     <div className="logistics-card p-6 space-y-4">
@@ -30,9 +33,9 @@ export function EventStream({ events }: EventStreamProps) {
         </span>
       </div>
 
-      <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
-        {events.length > 0 ? (
-          events.slice(0, 10).map((evt) => {
+      <div className="space-y-2.5 max-h-96 overflow-y-auto pr-1">
+        {displayedEvents.length > 0 ? (
+          displayedEvents.map((evt) => {
             const isExpanded = expandedId === evt.id;
             const isWarning = evt.severity === "WARNING" || evt.event_type.includes("STALE") || evt.event_type.includes("DELAY");
             const isCritical = evt.severity === "CRITICAL" || evt.event_type.includes("OFFLINE") || evt.event_type.includes("BREAKDOWN");
