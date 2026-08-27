@@ -1,9 +1,10 @@
 /**
- * Fleetos API Client
- * Connects Web Dashboard UI to FastAPI REST Backend Services & OR-Tools Optimization Engine
+ * Fleetos API Client & Resilience Layer
+ * Module Boundary: apps/web/lib/api.ts
+ * Connects Next.js Web Dashboard UI to FastAPI REST Backend Services
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
+const API_BASE_URL = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
 
 export interface Lorry {
   id: string;
@@ -49,69 +50,86 @@ export interface OperationalEvent {
   created_at: string;
 }
 
-export async function fetchHealth() {
+export interface ApiFetchResult<T> {
+  data: T | null;
+  error: string | null;
+  status: "success" | "offline" | "error";
+}
+
+/**
+ * Generic safe fetch helper preventing Server Component crashes on connection failures
+ */
+async function safeFleetosFetch<T>(path: string, options: RequestInit = {}): Promise<ApiFetchResult<T>> {
+  const url = `${API_BASE_URL}${path}`;
   try {
-    const res = await fetch(`${API_BASE_URL}/api/v1/health`, { cache: 'no-store' });
-    if (!res.ok) throw new Error("Health check failed");
-    return await res.json();
-  } catch (err) {
-    return { status: "offline", error: String(err) };
+    const res = await fetch(url, {
+      cache: "no-store",
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...(options.headers || {}),
+      },
+    });
+
+    if (!res.ok) {
+      return {
+        data: null,
+        error: `HTTP ${res.status}: ${res.statusText}`,
+        status: "error",
+      };
+    }
+
+    const data = await res.json();
+    return {
+      data,
+      error: null,
+      status: "success",
+    };
+  } catch (err: any) {
+    console.warn(`[Fleetos API Client] Connection to ${url} failed: ${err.message}`);
+    return {
+      data: null,
+      error: `Unable to connect to Fleetos API at ${API_BASE_URL}. Ensure FastAPI is running on port 8000.`,
+      status: "offline",
+    };
   }
+}
+
+export async function fetchHealth() {
+  const result = await safeFleetosFetch<{ status: string; service: string; version: string }>("/api/v1/health");
+  return result.data || { status: "offline", service: "fleetos-api", version: "0.2.0" };
 }
 
 export async function fetchDBHealth() {
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/v1/health/db`, { cache: 'no-store' });
-    if (!res.ok) throw new Error("DB Health check failed");
-    return await res.json();
-  } catch (err) {
-    return { status: "offline", database: "disconnected" };
-  }
+  const result = await safeFleetosFetch<{ status: string; database: string }>("/api/v1/health/db");
+  return result.data || { status: "offline", database: "disconnected" };
 }
 
 export async function fetchLorries(): Promise<Lorry[]> {
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/v1/lorries`, { cache: 'no-store' });
-    if (!res.ok) throw new Error("Failed to fetch lorries");
-    return await res.json();
-  } catch (err) {
-    console.error("Error fetching lorries:", err);
-    return [];
-  }
+  const result = await safeFleetosFetch<Lorry[]>("/api/v1/lorries");
+  return result.data || [];
 }
 
 export async function fetchShipments(): Promise<Shipment[]> {
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/v1/shipments`, { cache: 'no-store' });
-    if (!res.ok) throw new Error("Failed to fetch shipments");
-    return await res.json();
-  } catch (err) {
-    console.error("Error fetching shipments:", err);
-    return [];
-  }
+  const result = await safeFleetosFetch<Shipment[]>("/api/v1/shipments");
+  return result.data || [];
 }
 
 export async function fetchEvents(): Promise<OperationalEvent[]> {
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/v1/events`, { cache: 'no-store' });
-    if (!res.ok) throw new Error("Failed to fetch events");
-    return await res.json();
-  } catch (err) {
-    console.error("Error fetching events:", err);
-    return [];
-  }
+  const result = await safeFleetosFetch<OperationalEvent[]>("/api/v1/events");
+  return result.data || [];
 }
 
 export async function triggerOptimization(triggerReason = "MANUAL_REOPTIMIZE") {
-  try {
-    const res = await fetch(`${API_BASE_URL}/api/v1/optimization/run?trigger_reason=${encodeURIComponent(triggerReason)}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" }
-    });
-    if (!res.ok) throw new Error("Optimization solver call failed");
-    return await res.json();
-  } catch (err) {
-    console.error("Optimization error:", err);
-    throw err;
+  const url = `${API_BASE_URL}/api/v1/optimization/run?trigger_reason=${encodeURIComponent(triggerReason)}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Optimization failed: ${res.status} - ${errorText}`);
   }
+  return await res.json();
 }

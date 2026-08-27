@@ -1,5 +1,5 @@
 import { fetchShipments, Shipment } from "@/lib/api";
-import { Package, Clock, ShieldCheck } from "lucide-react";
+import { Package, Clock, ShieldCheck, AlertCircle } from "lucide-react";
 
 export const revalidate = 0; // Disable static caching for real-time shipment data
 
@@ -18,6 +18,13 @@ export default async function ShipmentsPage() {
           <span>Real Database Persisted ({shipments.length} Loads)</span>
         </div>
       </div>
+
+      {shipments.length === 0 && (
+        <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-center space-x-2">
+          <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+          <span>No live shipment records loaded. Ensure FastAPI backend is running on port 8000 (<code className="bg-amber-100 px-1 py-0.5 rounded">python -m uvicorn services.api.app.main:app --port 8000</code>).</span>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {shipments.map((s) => (

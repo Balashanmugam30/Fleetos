@@ -1,64 +1,50 @@
 # Fleetos Local Development Setup Guide
 
-Welcome to the local development guide for **Fleetos** (Agentic Multimodal Fleet Intelligence Platform).
+Product: **Fleetos** (Agentic Multimodal Fleet Intelligence Platform)
 
 ---
 
-## Prerequisites
+## Service Architecture & Endpoints
 
-1. **Node.js**: v22.0+ (`node -v`)
-2. **pnpm**: v10.0+ (`pnpm -v`)
-3. **Python**: v3.13.0+ (`python --version`)
-4. **Git**: v2.40+ (`git --version`)
+| Service | Port | Endpoint URL | Description |
+| :--- | :--- | :--- | :--- |
+| **Next.js Web Dashboard** | `3000` | `http://localhost:3000` | React 19 / Next.js 15 Control Tower UI |
+| **FastAPI REST API Server** | `8000` | `http://127.0.0.1:8000` | REST API, Database Persistence & Solvers |
+| **FastAPI Interactive Docs** | `8000` | `http://127.0.0.1:8000/docs` | Swagger UI API Documentation |
 
 ---
 
-## 1. Monorepo Setup
+## Canonical Local Startup Procedure
 
+### 1. Start FastAPI Backend Server (Terminal 1)
 ```bash
-# Clone the repository
-git clone https://github.com/Balashanmugam30/Fleetos.git
-cd Fleetos
+# Seed initial database records (if not already initialized)
+python scripts/seed_database.py
 
-# Install Node dependencies across monorepo workspace
-pnpm install
+# Start FastAPI server on port 8000
+python -m uvicorn services.api.app.main:app --host 0.0.0.0 --port 8000
+```
 
-# Setup environment variables
-cp .env.example .env
+### 2. Start Next.js Web Dashboard (Terminal 2)
+```bash
+# Start Next.js development server on port 3000
+pnpm --filter web dev
 ```
 
 ---
 
-## 2. Python Environment & Backend Setup
+## Key Health & Connectivity Check Commands
 
 ```bash
-# Create Python virtual environment (Optional but recommended)
-python -m venv .venv
-# Windows PowerShell activation:
-.venv\Scripts\Activate.ps1
+# Test FastAPI health
+curl http://127.0.0.1:8000/api/v1/health
 
-# Install required Python dependencies
-pip install -r requirements.txt
+# Test Database connection
+curl http://127.0.0.1:8000/api/v1/health/db
 
-# Run FastAPI backend server (Port 8000)
-pnpm run dev:api
+# Test Lorries data endpoint
+curl http://127.0.0.1:8000/api/v1/lorries
+
+# Test Shipments data endpoint
+curl http://127.0.0.1:8000/api/v1/shipments
 ```
-
----
-
-## 3. Web Dashboard Shell (Port 3000)
-
-```bash
-# Run Next.js web application
-pnpm run dev:web
-```
-
-Access the Web Control Tower at `http://localhost:3000`.
-
----
-
-## 4. Verification Commands
-
-- **Web Application Build**: `pnpm run build:web`
-- **FastAPI Endpoints Test**: `python -c "import requests; print(requests.get('http://localhost:8000/api/v1/health').json())"`
-- **OR-Tools Package Check**: `python -c "import ortools; print('OR-Tools version:', ortools.__version__)"`

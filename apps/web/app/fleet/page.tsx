@@ -1,7 +1,7 @@
 import { fetchLorries, Lorry } from "@/lib/api";
-import { Truck, ShieldCheck, RefreshCw } from "lucide-react";
+import { Truck, ShieldCheck, AlertCircle } from "lucide-react";
 
-export const revalidate = 0; // Disable static caching for real-time fleet data
+export const revalidate = 0; // Disable static caching for live fleet data
 
 export default async function FleetPage() {
   const lorries: Lorry[] = await fetchLorries();
@@ -15,9 +15,16 @@ export default async function FleetPage() {
         </div>
         <div className="flex items-center space-x-2 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-lg">
           <ShieldCheck className="w-4 h-4 text-emerald-600" />
-          <span>Real Backend Database Persisted</span>
+          <span>Real Backend Database Persisted ({lorries.length} Vehicles)</span>
         </div>
       </div>
+
+      {lorries.length === 0 && (
+        <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-center space-x-2">
+          <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+          <span>No live lorry records loaded. Ensure FastAPI backend is running on port 8000 (<code className="bg-amber-100 px-1 py-0.5 rounded">python -m uvicorn services.api.app.main:app --port 8000</code>).</span>
+        </div>
+      )}
 
       <div className="logistics-card overflow-hidden">
         <table className="min-w-full divide-y divide-slate-200 text-left text-sm">
@@ -58,7 +65,7 @@ export default async function FleetPage() {
             ) : (
               <tr>
                 <td colSpan={6} className="px-6 py-8 text-center text-slate-400">
-                  No lorry records retrieved from backend API. Run <code className="bg-slate-100 px-1 py-0.5 rounded">python scripts/seed_database.py</code> to populate.
+                  No lorry records retrieved from backend API. Run <code className="bg-slate-100 px-1 py-0.5 rounded">python scripts/seed_database.py</code> to seed.
                 </td>
               </tr>
             )}
