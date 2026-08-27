@@ -27,12 +27,27 @@ class VoiceService:
 
     def get_provider(self, requested_provider: Optional[str] = None) -> VoiceProvider:
         prov_name = (requested_provider or voice_config.active_provider).lower()
-        if prov_name in ["sarvam", "real"] and sarvam_config.is_sarvam_configured:
-            return SarvamVoiceProvider()
-        elif prov_name == "twilio" and twilio_config.is_twilio_configured:
-            return TwilioConversationRelayProvider()
-        elif prov_name in ["vapi", "legacy-vapi"] and voice_config.is_real_vapi_configured:
-            return VapiVoiceProvider()
+        if prov_name in ["sarvam", "real"]:
+            if sarvam_config.is_sarvam_configured:
+                return SarvamVoiceProvider()
+            elif requested_provider in ["sarvam", "real"]:
+                raise ValueError("Sarvam Voice Agent credentials are not configured in .env (SARVAM_API_KEY required).")
+            return DemoVoiceProvider()
+
+        elif prov_name == "twilio":
+            if twilio_config.is_twilio_configured:
+                return TwilioConversationRelayProvider()
+            elif requested_provider == "twilio":
+                raise ValueError("Twilio credentials are not configured in .env.")
+            return DemoVoiceProvider()
+
+        elif prov_name in ["vapi", "legacy-vapi"]:
+            if voice_config.is_real_vapi_configured:
+                return VapiVoiceProvider()
+            elif requested_provider in ["vapi", "legacy-vapi"]:
+                raise ValueError("Vapi credentials are not configured in .env.")
+            return DemoVoiceProvider()
+
         return DemoVoiceProvider()
 
     async def initiate_driver_call(
