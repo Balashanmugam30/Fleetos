@@ -5,6 +5,11 @@
 .env.test.local
 .env.production.local
 
+# Local SQLite databases
+*.db
+*.sqlite
+*.sqlite3
+
 # Node dependencies & logs
 node_modules/
 npm-debug.log*
