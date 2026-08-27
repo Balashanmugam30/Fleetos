@@ -13,6 +13,8 @@ export interface Lorry {
   max_volume_m3: number;
   current_latitude: number;
   current_longitude: number;
+  current_speed_km_h?: number;
+  current_heading_degrees?: number;
   fuel_efficiency_km_l: number;
   driver_id: string | null;
   status: string;
@@ -50,15 +52,45 @@ export interface OperationalEvent {
   created_at: string;
 }
 
+export interface VehicleTrackingState {
+  vehicle_id: string;
+  driver_id: string | null;
+  latitude: number;
+  longitude: number;
+  speed_kmh: number;
+  heading_degrees: number;
+  status: "MOVING" | "STOPPED" | "IDLE" | "OFFLINE" | "UNKNOWN";
+  freshness: "LIVE" | "RECENT" | "STALE" | "OFFLINE";
+  last_update_at: string;
+  telemetry_age_seconds: number;
+  source: string;
+  active_route_id: string | null;
+}
+
+export interface TrackingPosition {
+  vehicle_id: string;
+  latitude: number;
+  longitude: number;
+  speed_kmh: number;
+  heading_degrees: number;
+  recorded_at: string;
+  received_at: string;
+  source: string;
+}
+
+export interface SimulatorStatus {
+  running: boolean;
+  update_interval_seconds: number;
+  simulated_vehicles_count: number;
+  last_update_time: string | null;
+}
+
 export interface ApiFetchResult<T> {
   data: T | null;
   error: string | null;
   status: "success" | "offline" | "error";
 }
 
-/**
- * Generic safe fetch helper preventing Server Component crashes on connection failures
- */
 async function safeFleetosFetch<T>(path: string, options: RequestInit = {}): Promise<ApiFetchResult<T>> {
   const url = `${API_BASE_URL}${path}`;
   try {
@@ -89,7 +121,7 @@ async function safeFleetosFetch<T>(path: string, options: RequestInit = {}): Pro
     console.warn(`[Fleetos API Client] Connection to ${url} failed: ${err.message}`);
     return {
       data: null,
-      error: `Unable to connect to Fleetos API at ${API_BASE_URL}. Ensure FastAPI is running on port 8000.`,
+      error: `Unable to connect to Fleetos API at ${API_BASE_URL}.`,
       status: "offline",
     };
   }
@@ -118,6 +150,36 @@ export async function fetchShipments(): Promise<Shipment[]> {
 export async function fetchEvents(): Promise<OperationalEvent[]> {
   const result = await safeFleetosFetch<OperationalEvent[]>("/api/v1/events");
   return result.data || [];
+}
+
+export async function fetchLatestTracking(): Promise<VehicleTrackingState[]> {
+  const result = await safeFleetosFetch<VehicleTrackingState[]>("/api/v1/tracking/latest");
+  return result.data || [];
+}
+
+export async function fetchVehicleTracking(vehicleId: string): Promise<VehicleTrackingState | null> {
+  const result = await safeFleetosFetch<VehicleTrackingState>(`/api/v1/tracking/vehicles/${vehicleId}`);
+  return result.data;
+}
+
+export async function fetchTrackingHistory(vehicleId: string, limit = 50): Promise<TrackingPosition[]> {
+  const result = await safeFleetosFetch<TrackingPosition[]>(`/api/v1/tracking/vehicles/${vehicleId}/history?limit=${limit}`);
+  return result.data || [];
+}
+
+export async function startTrackingSimulator(): Promise<SimulatorStatus | null> {
+  const result = await safeFleetosFetch<SimulatorStatus>("/api/v1/tracking/simulator/start", { method: "POST" });
+  return result.data;
+}
+
+export async function stopTrackingSimulator(): Promise<SimulatorStatus | null> {
+  const result = await safeFleetosFetch<SimulatorStatus>("/api/v1/tracking/simulator/stop", { method: "POST" });
+  return result.data;
+}
+
+export async function fetchTrackingSimulatorStatus(): Promise<SimulatorStatus | null> {
+  const result = await safeFleetosFetch<SimulatorStatus>("/api/v1/tracking/simulator/status");
+  return result.data;
 }
 
 export async function triggerOptimization(triggerReason = "MANUAL_REOPTIMIZE") {

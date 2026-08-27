@@ -4,19 +4,13 @@ Product: **Fleetos**
 
 ---
 
-## Environment Variable Schema & Boundaries
+## Configuration Environment Variables
 
-All environment variables must be declared in `.env.example` before being used in application code.
-
-### 1. Server-Only Environment Variables (Private)
-
-- `VAPI_API_KEY`: Secret authentication token for Vapi AI telephony API.
-- `TWILIO_ACCOUNT_SID`: Secret SID for Twilio PSTN gateway.
-- `TWILIO_AUTH_TOKEN`: Secret authentication token for Twilio.
-- `DATABASE_URL`: PostgreSQL connection URI string.
-- `OPENAI_API_KEY` / `GEMINI_API_KEY`: LLM provider API credentials.
-
-### 2. Client-Exposed Environment Variables (Public)
-
-- `NEXT_PUBLIC_MAPBOX_TOKEN`: Mapbox GL public map access token.
-- `NEXT_PUBLIC_API_BASE_URL`: Public REST backend endpoint (e.g. `http://localhost:8000`).
+| Variable | Default Value | Scope | Description |
+| :--- | :--- | :--- | :--- |
+| `API_BASE_URL` | `http://127.0.0.1:8000` | Server-side Next.js | Base REST API URL for server component data fetching |
+| `NEXT_PUBLIC_API_BASE_URL` | `http://127.0.0.1:8000` | Client-side Next.js | Base REST API URL for client-side fetches |
+| `TRACKING_PROVIDER` | `simulator` | FastAPI | Active tracking provider (`simulator` or `gps`) |
+| `TRACKING_UPDATE_INTERVAL_SECONDS` | `5` | FastAPI | Simulator update interval in seconds |
+| `TRACKING_LIVE_THRESHOLD_SECONDS` | `30` | FastAPI | Telemetry age threshold for `LIVE` status |
+| `TRACKING_STALE_THRESHOLD_SECONDS` | `300` | FastAPI | Telemetry age threshold for `STALE` status |

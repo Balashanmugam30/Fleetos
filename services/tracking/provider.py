@@ -1,40 +1,25 @@
 """
 Fleetos Backend Tracking Provider Boundary
-Module Boundary: services/tracking
+Module Boundary: services/tracking/provider.py
 """
 
-from typing import Dict, Any, List, Optional
-from pydantic import BaseModel
-
-class TelemetryPosition(BaseModel):
-    lorry_id: str
-    latitude: float
-    longitude: float
-    timestamp: str
-    speed_km_h: float = 0.0
-    heading_degrees: float = 0.0
-    status: str = "EN_ROUTE"
+from typing import List, Optional
+from services.tracking.models import TrackingPosition
 
 class TrackingProvider:
     """Abstract Vehicle Telemetry Tracking Provider Interface."""
-    def get_position(self, lorry_id: str) -> Optional[TelemetryPosition]:
+    
+    def get_latest_positions(self) -> List[TrackingPosition]:
         raise NotImplementedError()
 
-    def get_all_positions(self) -> List[TelemetryPosition]:
+    def get_vehicle_position(self, vehicle_id: str) -> Optional[TrackingPosition]:
         raise NotImplementedError()
 
-class SimulatorTrackingProvider(TrackingProvider):
-    """Backend-Driven GPS Simulation Provider for Demos."""
-    def get_position(self, lorry_id: str) -> Optional[TelemetryPosition]:
-        return TelemetryPosition(
-            lorry_id=lorry_id,
-            latitude=12.9716,
-            longitude=77.5946,
-            timestamp="2026-08-27T17:45:00Z",
-            speed_km_h=55.4,
-            heading_degrees=90.0,
-            status="EN_ROUTE"
-        )
+    def get_recent_positions(self, vehicle_id: str, limit: int = 50) -> List[TrackingPosition]:
+        raise NotImplementedError()
 
-    def get_all_positions(self) -> List[TelemetryPosition]:
-        return [self.get_position("L01")]
+    def start(self) -> None:
+        pass
+
+    def stop(self) -> None:
+        pass
