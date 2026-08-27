@@ -195,3 +195,52 @@ export async function triggerOptimization(triggerReason = "MANUAL_REOPTIMIZE") {
   }
   return await res.json();
 }
+
+export interface VoiceHealth {
+  provider: string;
+  mode: string;
+  configured: boolean;
+  provider_reachable: boolean;
+  real_pstn_verified: boolean;
+  webhook_url: string;
+}
+
+export interface CallRecord {
+  id: string;
+  call_id: string;
+  driver_id: string;
+  lorry_id: string | null;
+  call_type: string;
+  direction: string;
+  status: string;
+  provider: string;
+  external_call_id: string | null;
+  duration_seconds: number;
+  event_id: string | null;
+  transcript: string | null;
+  outcome_summary: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export async function fetchVoiceHealth(): Promise<VoiceHealth | null> {
+  const result = await safeFleetosFetch<VoiceHealth>("/api/v1/voice/health");
+  return result.data;
+}
+
+export async function initiateDriverCall(driverId: string, callType = "STATUS_CHECK", notes = ""): Promise<CallRecord | null> {
+  const result = await safeFleetosFetch<CallRecord>("/api/v1/voice/calls", {
+    method: "POST",
+    body: JSON.stringify({
+      driver_id: driverId,
+      call_type: callType,
+      context_notes: notes
+    })
+  });
+  return result.data;
+}
+
+export async function fetchCallRecords(limit = 50): Promise<CallRecord[]> {
+  const result = await safeFleetosFetch<CallRecord[]>(`/api/v1/voice/calls?limit=${limit}`);
+  return result.data || [];
+}

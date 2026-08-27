@@ -219,6 +219,8 @@ class CallCreate(BaseModel):
     lorry_id: Optional[str] = None
     direction: str = "OUTBOUND"
     call_type: str = "STATUS_CHECK"
+    status: Optional[str] = "QUEUED"
+    phone_number: Optional[str] = None
 
 class CallResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)

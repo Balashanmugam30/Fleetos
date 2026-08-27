@@ -22,7 +22,8 @@ from services.api.app.routers import (
     events,
     calls,
     optimization,
-    tracking
+    tracking,
+    voice
 )
 
 @asynccontextmanager
@@ -72,6 +73,7 @@ app.include_router(events.router)
 app.include_router(calls.router)
 app.include_router(optimization.router)
 app.include_router(tracking.router)
+app.include_router(voice.router)
 
 if __name__ == "__main__":
     import uvicorn
