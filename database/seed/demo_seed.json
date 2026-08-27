@@ -1,0 +1,28 @@
+{
+  "drivers": [
+    { "id": "D01", "name": "Driver Anand", "phoneNumber": "+91-98765-10001", "availabilityStatus": "ON_DUTY", "currentLorryId": "L01" },
+    { "id": "D02", "name": "Driver Suresh", "phoneNumber": "+91-98765-10002", "availabilityStatus": "ON_DUTY", "currentLorryId": "L02" },
+    { "id": "D03", "name": "Driver Rajesh", "phoneNumber": "+91-98765-10003", "availabilityStatus": "ON_DUTY", "currentLorryId": "L03" },
+    { "id": "D04", "name": "Driver Vikram", "phoneNumber": "+91-98765-10004", "availabilityStatus": "UNAVAILABLE", "currentLorryId": "L04" },
+    { "id": "D05", "name": "Driver Karthik", "phoneNumber": "+91-98765-10005", "availabilityStatus": "AVAILABLE", "currentLorryId": "L05" }
+  ],
+  "lorries": [
+    { "id": "L01", "registrationNumber": "KA-01-EQ-1001", "maxWeightKg": 10000, "maxVolumeM3": 45.0, "currentLatitude": 12.9716, "currentLongitude": 77.5946, "fuelEfficiencyKmLiter": 3.5, "driverId": "D01", "status": "EN_ROUTE", "currentRouteId": "R01" },
+    { "id": "L02", "registrationNumber": "KA-01-EQ-1002", "maxWeightKg": 15000, "maxVolumeM3": 60.0, "currentLatitude": 12.7409, "currentLongitude": 77.8253, "fuelEfficiencyKmLiter": 2.8, "driverId": "D02", "status": "EN_ROUTE", "currentRouteId": "R02" },
+    { "id": "L03", "registrationNumber": "TN-02-AB-3003", "maxWeightKg": 8000, "maxVolumeM3": 35.0, "currentLatitude": 13.0827, "currentLongitude": 80.2707, "fuelEfficiencyKmLiter": 4.2, "driverId": "D03", "status": "EN_ROUTE", "currentRouteId": "R03" },
+    { "id": "L04", "registrationNumber": "AP-03-CD-4004", "maxWeightKg": 12000, "maxVolumeM3": 50.0, "currentLatitude": 16.5062, "currentLongitude": 80.6480, "fuelEfficiencyKmLiter": 3.0, "driverId": "D04", "status": "UNAVAILABLE", "currentRouteId": null },
+    { "id": "L05", "registrationNumber": "TN-09-XY-5005", "maxWeightKg": 14000, "maxVolumeM3": 55.0, "currentLatitude": 12.9165, "currentLongitude": 79.1325, "fuelEfficiencyKmLiter": 5.2, "driverId": "D05", "status": "IDLE", "currentRouteId": null }
+  ],
+  "shipments": [
+    {
+      "id": "S12",
+      "weightKg": 3500,
+      "volumeM3": 14.0,
+      "pickupLocation": { "address": "Chennai Port Terminal 2", "latitude": 13.0839, "longitude": 80.2925 },
+      "destination": { "address": "Bengaluru Electronic City", "latitude": 12.8399, "longitude": 77.6770 },
+      "deliveryDeadline": "2026-08-27T18:00:00Z",
+      "priority": "URGENT",
+      "status": "ASSIGNED"
+    }
+  ]
+}
