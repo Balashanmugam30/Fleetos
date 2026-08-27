@@ -73,7 +73,10 @@ app.include_router(events.router)
 app.include_router(calls.router)
 app.include_router(optimization.router)
 app.include_router(tracking.router)
+from services.voice.conversation_relay import router as twilio_router
+
 app.include_router(voice.router)
+app.include_router(twilio_router)
 
 if __name__ == "__main__":
     import uvicorn

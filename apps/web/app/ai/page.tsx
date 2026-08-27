@@ -80,7 +80,7 @@ export default function AIPage() {
             ATLAS Voice Agent Operations Center
           </h1>
           <p className="text-sm text-slate-500">
-            PSTN telephone driver dispatch, Vapi conversational gateway, tool execution & state update logs.
+            PSTN telephone driver dispatch, Twilio ConversationRelay gateway, tool execution & state update logs.
           </p>
         </div>
 
@@ -89,7 +89,7 @@ export default function AIPage() {
             isRealMode ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-blue-50 text-blue-700 border-blue-200"
           }`}>
             <ShieldCheck className="w-4 h-4" />
-            <span>{isRealMode ? "VAPI + TWILIO PSTN ACTIVE" : "DEMO TELEPHONY MODE"}</span>
+            <span>{isRealMode ? "TWILIO CONVERSATIONRELAY ACTIVE" : "DEMO TELEPHONY MODE"}</span>
           </div>
         </div>
       </div>

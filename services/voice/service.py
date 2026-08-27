@@ -11,6 +11,8 @@ from services.voice.models import OutboundCallRequest, CallRecord, CallStatus, C
 from services.voice.provider import VoiceProvider
 from services.voice.vapi import VapiVoiceProvider
 from services.voice.simulator import DemoVoiceProvider
+from services.voice.twilio_provider import TwilioConversationRelayProvider
+from services.voice.twilio_config import twilio_config
 from services.voice.config import voice_config
 from services.api.app import crud
 
@@ -23,7 +25,9 @@ class VoiceService:
 
     def get_provider(self, requested_provider: Optional[str] = None) -> VoiceProvider:
         prov_name = (requested_provider or voice_config.active_provider).lower()
-        if prov_name == "vapi" and voice_config.is_real_vapi_configured:
+        if prov_name in ["twilio", "real"] and twilio_config.is_twilio_configured:
+            return TwilioConversationRelayProvider()
+        elif prov_name == "vapi" and voice_config.is_real_vapi_configured:
             return VapiVoiceProvider()
         return DemoVoiceProvider()
 
@@ -109,15 +113,23 @@ class VoiceService:
         return self._call_records.get(call_id)
 
     def get_health(self) -> VoiceHealthResponse:
-        prov = voice_config.active_provider
-        is_configured = voice_config.is_real_vapi_configured
+        is_twilio_ok = twilio_config.is_twilio_configured
+        is_openai_ok = twilio_config.is_openai_configured
+        is_real = twilio_config.is_real_pstn_ready
+
+        base_url = twilio_config.webhook_base_url.rstrip('/')
         return VoiceHealthResponse(
-            provider="vapi" if is_configured else "demo",
-            mode="REAL" if is_configured else "DEMO",
-            configured=is_configured,
+            provider="twilio" if is_twilio_ok else "demo",
+            mode="REAL" if is_real else "DEMO",
+            configured=is_real,
+            twilio_configured=is_twilio_ok,
+            openai_configured=is_openai_ok,
+            public_webhook_configured=twilio_config.is_public_webhook_configured,
+            websocket_configured=True,
+            real_pstn_ready=is_real,
             provider_reachable=True,
-            real_pstn_verified=False,
-            webhook_url=f"{voice_config.webhook_base_url}/api/v1/voice/webhooks/vapi"
+            real_pstn_verified=is_real,
+            webhook_url=f"{base_url}/api/v1/voice/twilio/connect"
         )
 
 voice_service = VoiceService()

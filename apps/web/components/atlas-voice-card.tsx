@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { PhoneCall, ShieldCheck, Play, ArrowRight, Activity, CheckCircle2 } from "lucide-react";
+import { PhoneCall, ShieldCheck, ArrowRight } from "lucide-react";
 import { VoiceHealth, CallRecord, fetchVoiceHealth, initiateDriverCall, fetchCallRecords } from "@/lib/api";
 
 export function AtlasVoiceCard() {
@@ -57,15 +57,15 @@ export function AtlasVoiceCard() {
           <div>
             <h3 className="text-base font-bold text-slate-900 flex items-center">
               <PhoneCall className="w-4 h-4 mr-2 text-brand-600" />
-              ATLAS Operational Voice Agent
+              ATLAS — TWILIO VOICE
             </h3>
-            <p className="text-xs text-slate-500">PSTN telephony call dispatch & voice tool executor.</p>
+            <p className="text-xs text-slate-500">Twilio ConversationRelay PSTN call dispatch & AI tool executor.</p>
           </div>
 
           <span className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
             isRealMode ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-blue-50 text-blue-700 border border-blue-200"
           }`}>
-            {isRealMode ? "REAL VOICE ACTIVE" : "DEMO TELEPHONY MODE"}
+            {isRealMode ? "TWILIO REAL VOICE ACTIVE" : "DEMO TELEPHONY MODE"}
           </span>
         </div>
 

@@ -53,6 +53,11 @@ class VoiceHealthResponse(BaseModel):
     provider: str
     mode: str  # 'REAL' | 'DEMO'
     configured: bool
-    provider_reachable: bool
-    real_pstn_verified: bool
+    twilio_configured: bool = False
+    openai_configured: bool = False
+    public_webhook_configured: bool = False
+    websocket_configured: bool = False
+    real_pstn_ready: bool = False
+    provider_reachable: bool = True
+    real_pstn_verified: bool = False
     webhook_url: str
