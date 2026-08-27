@@ -42,9 +42,9 @@ export function Navigation() {
                 FLEET<span className="text-brand-600">OS</span>
               </span>
             </Link>
-            <span className="hidden md:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
-              <ShieldCheck className="w-3 h-3 mr-1" />
-              Phase 1 Active
+            <span className="hidden md:inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-50 text-brand-700 border border-brand-200">
+              <ShieldCheck className="w-3.3 h-3.3 mr-1 text-brand-600" />
+              Control Tower Active
             </span>
           </div>
 
