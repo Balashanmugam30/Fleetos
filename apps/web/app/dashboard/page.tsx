@@ -50,7 +50,7 @@ export default function DashboardPage() {
             <ShieldCheck className="w-4 h-4 text-emerald-600" />
           </div>
           <span className="text-2xl font-bold text-emerald-600">OR-Tools 9.15</span>
-          <span className="block text-xs text-slate-400 mt-1">CP-SAT VRP Engine Ready</span>
+          <span className="block text-xs text-slate-400 mt-1">Routing Solver / RoutingModel Ready</span>
         </div>
       </div>
 

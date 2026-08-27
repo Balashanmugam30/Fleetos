@@ -1,19 +1,41 @@
 """
-Fleetos FastAPI Master Server
+Fleetos FastAPI Master Application Server
 Module Boundary: services/api/app/main.py
 Product: Fleetos (Agentic Multimodal Fleet Intelligence Platform)
 """
 
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+
 from services.api.app.config import settings
-from services.api.app.schemas import HealthResponse, VersionResponse, ErrorResponse, ErrorDetail
+from services.api.app.db.database import init_db
+from services.api.app.schemas import ErrorResponse, ErrorDetail
+from services.api.app.routers import (
+    health,
+    lorries,
+    drivers,
+    shipments,
+    assignments,
+    routes,
+    events,
+    calls,
+    optimization,
+    tracking
+)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Initialize Database DDL Tables on Startup
+    await init_db()
+    yield
 
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    description="Fleetos Agentic Multimodal Fleet Intelligence Platform REST & Webhook Gateway"
+    description="Fleetos Agentic Multimodal Fleet Intelligence Platform REST & Webhook Gateway",
+    lifespan=lifespan
 )
 
 # Configure Security CORS Policies
@@ -21,10 +43,11 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allow_headers=["*"],
 )
 
+# Global Exception Handler for Uncaught Server Errors
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     return JSONResponse(
@@ -33,29 +56,22 @@ async def global_exception_handler(request: Request, exc: Exception):
             error=ErrorDetail(
                 code="INTERNAL_SERVER_ERROR",
                 message="An unexpected server error occurred.",
-                details={"path": str(request.url.path)}
+                details={"path": str(request.url.path), "error": str(exc)}
             )
         ).model_dump()
     )
 
-@app.get("/health", response_model=HealthResponse, tags=["Health"])
-@app.get("/api/v1/health", response_model=HealthResponse, tags=["Health"])
-async def get_health():
-    return HealthResponse(
-        status="ok",
-        service="fleetos-api",
-        version=settings.APP_VERSION,
-        environment=settings.ENVIRONMENT
-    )
-
-@app.get("/api/v1/version", response_model=VersionResponse, tags=["Version"])
-async def get_version():
-    return VersionResponse(
-        name="Fleetos Agentic Multimodal Fleet Intelligence Platform",
-        version=settings.APP_VERSION,
-        core_loop="SEE → HEAR → THINK → OPTIMIZE → ACT → UPDATE",
-        voice_agent="ATLAS"
-    )
+# Register Versioned API Routers
+app.include_router(health.router)
+app.include_router(lorries.router)
+app.include_router(drivers.router)
+app.include_router(shipments.router)
+app.include_router(assignments.router)
+app.include_router(routes.router)
+app.include_router(events.router)
+app.include_router(calls.router)
+app.include_router(optimization.router)
+app.include_router(tracking.router)
 
 if __name__ == "__main__":
     import uvicorn

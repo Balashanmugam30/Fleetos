@@ -1,22 +1,145 @@
 {
+  "metadata": {
+    "product": "Fleetos",
+    "version": "0.2.0",
+    "scenarios": [
+      "SCENARIO_A_BASELINE",
+      "SCENARIO_B_CAPACITY_CONFLICT",
+      "SCENARIO_C_DEADLINE_CONFLICT",
+      "SCENARIO_D_DRIVER_UNAVAILABLE",
+      "SCENARIO_E_SAME_DESTINATION_CLUSTER",
+      "SCENARIO_F_URGENT_SHIPMENT",
+      "SCENARIO_G_DELAYED_LORRY"
+    ]
+  },
   "drivers": [
-    { "id": "D01", "name": "Driver Anand", "phoneNumber": "+91-98765-10001", "availabilityStatus": "ON_DUTY", "currentLorryId": "L01" },
-    { "id": "D02", "name": "Driver Suresh", "phoneNumber": "+91-98765-10002", "availabilityStatus": "ON_DUTY", "currentLorryId": "L02" },
-    { "id": "D03", "name": "Driver Rajesh", "phoneNumber": "+91-98765-10003", "availabilityStatus": "ON_DUTY", "currentLorryId": "L03" },
-    { "id": "D04", "name": "Driver Vikram", "phoneNumber": "+91-98765-10004", "availabilityStatus": "UNAVAILABLE", "currentLorryId": "L04" },
-    { "id": "D05", "name": "Driver Karthik", "phoneNumber": "+91-98765-10005", "availabilityStatus": "AVAILABLE", "currentLorryId": "L05" }
+    { "id": "D01", "name": "Driver Anand", "phoneNumber": "+919876510001", "availabilityStatus": "ON_DUTY", "currentLorryId": "L01" },
+    { "id": "D02", "name": "Driver Suresh", "phoneNumber": "+919876510002", "availabilityStatus": "ON_DUTY", "currentLorryId": "L02" },
+    { "id": "D03", "name": "Driver Rajesh", "phoneNumber": "+919876510003", "availabilityStatus": "ON_DUTY", "currentLorryId": "L03" },
+    { "id": "D04", "name": "Driver Vikram", "phoneNumber": "+919876510004", "availabilityStatus": "UNAVAILABLE", "currentLorryId": "L04" },
+    { "id": "D05", "name": "Driver Karthik", "phoneNumber": "+919876510005", "availabilityStatus": "AVAILABLE", "currentLorryId": "L05" }
   ],
   "lorries": [
-    { "id": "L01", "registrationNumber": "KA-01-EQ-1001", "maxWeightKg": 10000, "maxVolumeM3": 45.0, "currentLatitude": 12.9716, "currentLongitude": 77.5946, "fuelEfficiencyKmLiter": 3.5, "driverId": "D01", "status": "EN_ROUTE", "currentRouteId": "R01" },
-    { "id": "L02", "registrationNumber": "KA-01-EQ-1002", "maxWeightKg": 15000, "maxVolumeM3": 60.0, "currentLatitude": 12.7409, "currentLongitude": 77.8253, "fuelEfficiencyKmLiter": 2.8, "driverId": "D02", "status": "EN_ROUTE", "currentRouteId": "R02" },
-    { "id": "L03", "registrationNumber": "TN-02-AB-3003", "maxWeightKg": 8000, "maxVolumeM3": 35.0, "currentLatitude": 13.0827, "currentLongitude": 80.2707, "fuelEfficiencyKmLiter": 4.2, "driverId": "D03", "status": "EN_ROUTE", "currentRouteId": "R03" },
-    { "id": "L04", "registrationNumber": "AP-03-CD-4004", "maxWeightKg": 12000, "maxVolumeM3": 50.0, "currentLatitude": 16.5062, "currentLongitude": 80.6480, "fuelEfficiencyKmLiter": 3.0, "driverId": "D04", "status": "UNAVAILABLE", "currentRouteId": null },
-    { "id": "L05", "registrationNumber": "TN-09-XY-5005", "maxWeightKg": 14000, "maxVolumeM3": 55.0, "currentLatitude": 12.9165, "currentLongitude": 79.1325, "fuelEfficiencyKmLiter": 5.2, "driverId": "D05", "status": "IDLE", "currentRouteId": null }
+    { "id": "L01", "registrationNumber": "KA-01-EQ-1001", "maxWeightKg": 10000.0, "maxVolumeM3": 45.0, "currentLatitude": 12.9716, "currentLongitude": 77.5946, "currentSpeedKmH": 45.0, "currentHeadingDegrees": 90.0, "fuelEfficiencyKmLiter": 3.5, "driverId": "D01", "status": "EN_ROUTE", "currentRouteId": "R01" },
+    { "id": "L02", "registrationNumber": "KA-01-EQ-1002", "maxWeightKg": 15000.0, "maxVolumeM3": 60.0, "currentLatitude": 12.7409, "currentLongitude": 77.8253, "currentSpeedKmH": 50.0, "currentHeadingDegrees": 180.0, "fuelEfficiencyKmLiter": 2.8, "driverId": "D02", "status": "EN_ROUTE", "currentRouteId": "R02" },
+    { "id": "L03", "registrationNumber": "TN-02-AB-3003", "maxWeightKg": 8000.0, "maxVolumeM3": 35.0, "currentLatitude": 13.0827, "currentLongitude": 80.2707, "currentSpeedKmH": 0.0, "currentHeadingDegrees": 0.0, "fuelEfficiencyKmLiter": 4.2, "driverId": "D03", "status": "LOADING", "currentRouteId": "R03" },
+    { "id": "L04", "registrationNumber": "AP-03-CD-4004", "maxWeightKg": 12000.0, "maxVolumeM3": 50.0, "currentLatitude": 16.5062, "currentLongitude": 80.6480, "currentSpeedKmH": 0.0, "currentHeadingDegrees": 0.0, "fuelEfficiencyKmLiter": 3.0, "driverId": "D04", "status": "UNAVAILABLE", "currentRouteId": null },
+    { "id": "L05", "registrationNumber": "TN-09-XY-5005", "maxWeightKg": 14000.0, "maxVolumeM3": 55.0, "currentLatitude": 12.9165, "currentLongitude": 79.1325, "currentSpeedKmH": 0.0, "currentHeadingDegrees": 0.0, "fuelEfficiencyKmLiter": 5.2, "driverId": "D05", "status": "IDLE", "currentRouteId": null }
   ],
   "shipments": [
     {
+      "id": "S01",
+      "weightKg": 2000.0,
+      "volumeM3": 8.0,
+      "pickupLocation": { "address": "Chennai Hub Port A", "latitude": 13.0827, "longitude": 80.2707 },
+      "destination": { "address": "Bengaluru Electronic City Phase 1", "latitude": 12.8399, "longitude": 77.6770 },
+      "deliveryDeadline": "2026-08-28T12:00:00Z",
+      "priority": "NORMAL",
+      "status": "ASSIGNED"
+    },
+    {
+      "id": "S02",
+      "weightKg": 1500.0,
+      "volumeM3": 6.0,
+      "pickupLocation": { "address": "Chennai Hub Port A", "latitude": 13.0827, "longitude": 80.2707 },
+      "destination": { "address": "Bengaluru Electronic City Phase 1", "latitude": 12.8399, "longitude": 77.6770 },
+      "deliveryDeadline": "2026-08-28T14:00:00Z",
+      "priority": "NORMAL",
+      "status": "ASSIGNED"
+    },
+    {
+      "id": "S03",
+      "weightKg": 4000.0,
+      "volumeM3": 15.0,
+      "pickupLocation": { "address": "Hosur Logistics Depot", "latitude": 12.7409, "longitude": 77.8253 },
+      "destination": { "address": "Chennai Sriperumbudur Industrial Zone", "latitude": 12.9699, "longitude": 79.9400 },
+      "deliveryDeadline": "2026-08-28T16:00:00Z",
+      "priority": "HIGH",
+      "status": "ASSIGNED"
+    },
+    {
+      "id": "S04",
+      "weightKg": 2500.0,
+      "volumeM3": 10.0,
+      "pickupLocation": { "address": "Bengaluru Peenya Industrial Area", "latitude": 13.0323, "longitude": 77.5226 },
+      "destination": { "address": "Hyderabad HITEC City", "latitude": 17.4435, "longitude": 78.3772 },
+      "deliveryDeadline": "2026-08-29T10:00:00Z",
+      "priority": "NORMAL",
+      "status": "UNASSIGNED"
+    },
+    {
+      "id": "S05",
+      "weightKg": 3000.0,
+      "volumeM3": 12.0,
+      "pickupLocation": { "address": "Vellore Freight Station", "latitude": 12.9165, "longitude": 79.1325 },
+      "destination": { "address": "Bengaluru Whitefield IT Park", "latitude": 12.9698, "longitude": 77.7500 },
+      "deliveryDeadline": "2026-08-28T17:00:00Z",
+      "priority": "NORMAL",
+      "status": "UNASSIGNED"
+    },
+    {
+      "id": "S06",
+      "weightKg": 1800.0,
+      "volumeM3": 7.0,
+      "pickupLocation": { "address": "Vijayawada Auto Nagar", "latitude": 16.5062, "longitude": 80.6480 },
+      "destination": { "address": "Chennai Central Depot", "latitude": 13.0827, "longitude": 80.2707 },
+      "deliveryDeadline": "2026-08-29T18:00:00Z",
+      "priority": "LOW",
+      "status": "UNASSIGNED"
+    },
+    {
+      "id": "S07",
+      "weightKg": 2200.0,
+      "volumeM3": 9.0,
+      "pickupLocation": { "address": "Chennai Guindy Industrial Estate", "latitude": 13.0067, "longitude": 80.2020 },
+      "destination": { "address": "Coimbatore Peelamedu Hub", "latitude": 11.0284, "longitude": 77.0016 },
+      "deliveryDeadline": "2026-08-29T14:00:00Z",
+      "priority": "NORMAL",
+      "status": "UNASSIGNED"
+    },
+    {
+      "id": "S08",
+      "weightKg": 1200.0,
+      "volumeM3": 5.0,
+      "pickupLocation": { "address": "Bengaluru Electronic City", "latitude": 12.8399, "longitude": 77.6770 },
+      "destination": { "address": "Mysuru Belagola Industrial Area", "latitude": 12.3556, "longitude": 76.6022 },
+      "deliveryDeadline": "2026-08-28T19:00:00Z",
+      "priority": "NORMAL",
+      "status": "UNASSIGNED"
+    },
+    {
+      "id": "S09",
+      "weightKg": 3200.0,
+      "volumeM3": 13.0,
+      "pickupLocation": { "address": "Hyderabad Cherlapally Industrial Park", "latitude": 17.4729, "longitude": 78.6186 },
+      "destination": { "address": "Bengaluru Outer Ring Road Corridor", "latitude": 12.9260, "longitude": 77.6762 },
+      "deliveryDeadline": "2026-08-30T09:00:00Z",
+      "priority": "HIGH",
+      "status": "UNASSIGNED"
+    },
+    {
+      "id": "S10",
+      "weightKg": 1600.0,
+      "volumeM3": 6.5,
+      "pickupLocation": { "address": "Pondicherry Logistics Depot", "latitude": 11.9416, "longitude": 79.8083 },
+      "destination": { "address": "Chennai Ennore Port", "latitude": 13.2570, "longitude": 80.3298 },
+      "deliveryDeadline": "2026-08-28T21:00:00Z",
+      "priority": "LOW",
+      "status": "UNASSIGNED"
+    },
+    {
+      "id": "S11",
+      "weightKg": 7500.0,
+      "volumeM3": 30.0,
+      "pickupLocation": { "address": "Chennai Outer Ring Depot", "latitude": 13.0500, "longitude": 80.1500 },
+      "destination": { "address": "Bengaluru Yeshwanthpur Freight Terminal", "latitude": 13.0238, "longitude": 77.5501 },
+      "deliveryDeadline": "2026-08-29T11:00:00Z",
+      "priority": "HIGH",
+      "status": "UNASSIGNED"
+    },
+    {
       "id": "S12",
-      "weightKg": 3500,
+      "weightKg": 3500.0,
       "volumeM3": 14.0,
       "pickupLocation": { "address": "Chennai Port Terminal 2", "latitude": 13.0839, "longitude": 80.2925 },
       "destination": { "address": "Bengaluru Electronic City", "latitude": 12.8399, "longitude": 77.6770 },

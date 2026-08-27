@@ -29,7 +29,7 @@ Product Name: **Fleetos**
 - **Category**: Algorithmic Integrity
 - **Severity**: `HIGH`
 - **Description**: Allowing an LLM to invent vehicle routes or compute spatial assignments causes hallucinated, infeasible, and non-deterministic logistics decisions.
-- **Mitigation**: Strict authority boundary lock. The LLM (ATLAS) is strictly an interface/extractor. Deterministic Google OR-Tools CP-SAT VRP solver handles 100% of route and load calculations.
+- **Mitigation**: Strict authority boundary lock. The LLM (ATLAS) is strictly an interface/extractor. Deterministic Google OR-Tools Routing Solver / RoutingModel handles 100% of route and load calculations.
 - **Fallback Plan**: Deterministic pre-computed fallback matrix if OR-Tools solver encounters unexpected parameter errors.
 
 ### Risk 4: Mapbox API Rate Limits & Offline Network Latency

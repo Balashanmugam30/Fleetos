@@ -13,7 +13,7 @@ export default function OptimizationPage() {
           <div className="flex items-center space-x-3">
             <Cpu className="w-6 h-6 text-emerald-600" />
             <div>
-              <h3 className="text-base font-bold text-slate-900">Google OR-Tools CP-SAT VRP Engine</h3>
+              <h3 className="text-base font-bold text-slate-900">Google OR-Tools Routing Solver / RoutingModel</h3>
               <p className="text-xs text-slate-500">Python 3.13 Wheel Package `ortools-9.15.6755` Active</p>
             </div>
           </div>

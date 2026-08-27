@@ -1,27 +1,27 @@
 # FLEETOS PHASE EXECUTION GOVERNANCE & STATUS TRACKER
 
 Product Name: **FLEETOS** (Agentic Multimodal Fleet Intelligence Platform)  
-Current Master Phase: **PHASE 1 (Monorepo Foundation & Repository Integration)**  
-Phase 1 Status: **COMPLETED & PUSHED TO GITHUB**
+Current Master Phase: **PHASE 2 (Database, Persistence Layer & CRUD APIs)**  
+Phase 2 Status: **COMPLETED & PUSHED TO GITHUB**
 
 ---
 
-## 1. Phase 1 Verification Checklist Matrix
+## 1. Phase 2 Verification Checklist Matrix
 
-- [x] Workspace inspected & Phase 0 documentation preserved.
-- [x] Git repository branch set to `main`.
-- [x] Remote origin configured to `https://github.com/Balashanmugam30/Fleetos.git`.
-- [x] Remote repository connection verified via `git ls-remote origin`.
-- [x] Monorepo workspace configuration created (`package.json`, `pnpm-workspace.yaml`, `.gitignore`, `.env.example`, `requirements.txt`).
-- [x] Shared TypeScript data contracts created (`shared/types/fleetos.ts`).
-- [x] Database DDL schema & JSON seed fixtures created (`database/schema/ddl.sql`, `database/seed/demo_seed.json`).
-- [x] FastAPI backend application built (`services/api/app/main.py`, `config.py`, `schemas.py`) with CORS security, versioned endpoints (`/health`, `/api/v1/health`, `/api/v1/version`), and error handlers.
-- [x] Service boundaries created (`services/optimizer`, `services/agent`, `services/voice`, `services/events`, `services/vision`, `services/tracking`).
-- [x] Next.js 15 Web Command Tower app created in `apps/web` with bright enterprise logistics light UI theme.
-- [x] Placeholder Control Tower routes created (`/`, `/dashboard`, `/fleet`, `/shipments`, `/routes`, `/events`, `/optimization`, `/ai`, `/settings`).
-- [x] Architecture & developer documentation updated in `docs/architecture/` and `docs/development/`.
-- [x] Developer scripts created in `scripts/demo/`.
-- [x] Git commit created (`feat: establish Fleetos phase 1 foundation`).
+- [x] Terminology updated across documentation to **Google OR-Tools Routing Solver / RoutingModel**.
+- [x] Database persistence layer implemented via SQLAlchemy 2.x async ORM (`database.py`, `models.py`).
+- [x] Support for both PostgreSQL (`asyncpg`) and SQLite (`aiosqlite`) engine configurations.
+- [x] 10 canonical tables created (`drivers`, `lorries`, `shipments`, `assignments`, `routes`, `route_stops`, `events`, `calls`, `optimization_runs`, `tracking_positions`).
+- [x] Canonical demo seed dataset (Lorries L01-L05, Drivers D01-D05, Shipments S01-S12) loaded via `scripts/seed_database.py`.
+- [x] FastAPI REST CRUD APIs implemented under `/api/v1/` for all entities.
+- [x] DB Health endpoint `GET /api/v1/health/db` implemented and verified.
+- [x] Pydantic & SQLAlchemy server-side validation rules enforced (positive weight/volume, coordinate bounds).
+- [x] Shipment status transition state machine rules enforced (`crud.py`).
+- [x] Web Control Tower pages (`/fleet`, `/shipments`, `/dashboard`) bound directly to backend database API.
+- [x] Automated test suite passed 6/6 tests (`services/api/tests/test_database.py`).
+- [x] Next.js production build (`pnpm --filter web build`) compiled cleanly into dynamic/static pages.
+- [x] Security audit completed (no credentials or database keys committed).
+- [x] Git commit created (`feat: add Fleetos database and persistence layer`).
 - [x] Pushed commit to remote repository `origin/main`.
 - [x] Remote commit verified via `git ls-remote origin refs/heads/main`.
 
@@ -29,21 +29,20 @@ Phase 1 Status: **COMPLETED & PUSHED TO GITHUB**
 
 ## 2. Component Readiness Summary Matrix
 
-| Component | Status | Evidence | Risk Level | Next Action for Phase 2 |
+| Component | Status | Evidence | Risk Level | Next Action for Phase 3 |
 | :--- | :--- | :--- | :--- | :--- |
-| **Monorepo Foundation** | `VERIFIED` | `pnpm` workspace & root dependencies configured | `NONE` | Proceed to database migrations |
-| **FastAPI Backend** | `VERIFIED` | Server endpoints tested cleanly in Python | `LOW` | Build database ORM & CRUD routes |
-| **Next.js Web App** | `VERIFIED` | Next.js 15 App Router shell built cleanly | `LOW` | Implement database state binding |
-| **Optimization Engine** | `VERIFIED` | OR-Tools 9.15 solver interface defined | `LOW` | Build CP-SAT VRP solver logic |
-| **ATLAS Agent & Voice** | `VERIFIED` | Tool registry & telephony provider adapters defined | `LOW` | Scaffold Vapi webhook router |
-| **Augmented Reality** | `VERIFIED` | MindAR WebAR overlay & iOS target structured | `LOW` | Connect AR view to live API |
+| **Database Persistence** | `VERIFIED` | 10 tables initialized & seeded cleanly | `NONE` | Serve data to OR-Tools solver |
+| **FastAPI REST CRUD** | `VERIFIED` | 10 router modules active under `/api/v1/` | `NONE` | Provide solver input endpoints |
+| **Web UI Real Data** | `VERIFIED` | Next.js `/fleet` & `/shipments` render DB data | `NONE` | Add solver control UI |
+| **Optimization Boundary** | `VERIFIED` | OR-Tools Routing Solver interface ready | `LOW` | Implement RoutingModel logic |
 | **GitHub Integration** | `VERIFIED` | Pushed to `https://github.com/Balashanmugam30/Fleetos` | `NONE` | Maintain main branch CI readiness |
 
 ---
 
-## 3. Next Phase Prerequisites (Phase 2 Target)
+## 3. Next Phase Prerequisites (Phase 3 Target)
 
-Phase 2 will establish:
-1. PostgreSQL / Supabase database connection and migration tooling.
-2. Canonical seed dataset loading scripts (Lorries L01-L05, Drivers D01-D05, Shipments S01-S12).
-3. FastAPI CRUD routes for Lorries, Drivers, Shipments, and Routes under `/api/v1/`.
+Phase 3 will establish:
+1. Google OR-Tools Routing Solver / RoutingModel VRP implementation (`services/optimizer/solver.py`).
+2. Distance & travel-time matrix computation engine (Mapbox Directions API / OSRM + Haversine fallback matrix).
+3. Constraint enforcement: Lorry weight limits, volume capacities, driver availabilities, delivery deadlines (time windows), fuel efficiency optimization (km/L), and priority penalties.
+4. FastAPI optimization endpoint `POST /api/v1/optimization/solve`.

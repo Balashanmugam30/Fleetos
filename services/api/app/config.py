@@ -4,11 +4,13 @@ Module Boundary: services/api/app/config.py
 """
 
 import os
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
     APP_NAME: str = "Fleetos API"
-    APP_VERSION: str = "0.1.0"
+    APP_VERSION: str = "0.2.0"
     ENVIRONMENT: str = os.getenv("APP_ENV", "development")
     DEBUG: bool = os.getenv("DEBUG", "true").lower() == "true"
     
@@ -24,10 +26,6 @@ class Settings(BaseSettings):
     VAPI_PHONE_NUMBER_ID: str = os.getenv("VAPI_PHONE_NUMBER_ID", "")
     
     # Database
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "postgresql+asyncpg://postgres:postgres@localhost:5432/fleetos_db")
-
-    class Config:
-        env_file = ".env"
-        extra = "ignore"
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./fleetos.db")
 
 settings = Settings()
