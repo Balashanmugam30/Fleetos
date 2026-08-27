@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Key, MapPin, PhoneCall, ShieldCheck, CheckCircle2, XCircle, Globe } from "lucide-react";
+import { Key, MapPin, PhoneCall, ShieldCheck, CheckCircle2, XCircle, Globe, AlertTriangle } from "lucide-react";
 import { fetchVoiceHealth, VoiceHealth } from "@/lib/api";
 
 export default function SettingsPage() {
@@ -48,27 +48,42 @@ export default function SettingsPage() {
           <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
             <div className="flex justify-between items-center font-semibold">
               <span className="text-slate-600">Twilio Telephony:</span>
-              {health?.twilio_configured ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <XCircle className="w-4 h-4 text-slate-400" />}
+              {health?.twilio_credentials_valid ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <XCircle className="w-4 h-4 text-slate-400" />}
             </div>
-            <p className="text-[11px] text-slate-500">{health?.twilio_configured ? "Twilio SID & Auth Set" : "Simulated PSTN"}</p>
+            <p className="text-[11px] text-slate-500">{health?.twilio_credentials_valid ? "Twilio SID & Auth Valid" : "Simulated PSTN"}</p>
           </div>
 
           <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
             <div className="flex justify-between items-center font-semibold">
-              <span className="text-slate-600">Fleetos Tool Endpoint:</span>
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <span className="text-slate-600">Provisioned Numbers:</span>
+              {health?.twilio_provisioned_number_count ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <AlertTriangle className="w-4 h-4 text-amber-600" />}
             </div>
-            <p className="text-[11px] text-slate-500">POST /sarvam/tools/report-delay</p>
+            <p className="text-[11px] text-slate-500">
+              {health?.twilio_provisioned_number_count ? `${health.twilio_provisioned_number_count} Incoming Numbers` : "0 Numbers (Trial Sandbox)"}
+            </p>
           </div>
 
           <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
             <div className="flex justify-between items-center font-semibold">
-              <span className="text-slate-600">Public Webhook:</span>
-              {health?.public_webhook_configured ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <XCircle className="w-4 h-4 text-slate-400" />}
+              <span className="text-slate-600">Sarvam Import Status:</span>
+              {health?.sarvam_number_imported ? <CheckCircle2 className="w-4 h-4 text-emerald-600" /> : <XCircle className="w-4 h-4 text-slate-400" />}
             </div>
-            <p className="text-[11px] text-slate-500">{health?.public_webhook_configured ? "Public Ingress Active" : "Local Endpoint"}</p>
+            <p className="text-[11px] text-slate-500">{health?.sarvam_number_imported ? "Number Imported" : "Requires Provisioned Number"}</p>
           </div>
         </div>
+
+        {/* Informational Box for Twilio Trial Phone Limitation */}
+        {health?.twilio_credentials_valid && (health?.twilio_provisioned_number_count === 0) && (
+          <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs space-y-1">
+            <span className="font-bold text-amber-900 flex items-center">
+              <AlertTriangle className="w-4 h-4 mr-1.5 text-amber-600" />
+              Twilio Trial "Try Out Voice" Sandbox Notice
+            </span>
+            <p className="text-amber-800 text-[11px] leading-relaxed">
+              Twilio trial accounts supply sandbox test numbers which work for Twilio's internal API test flows, but return 0 numbers under Twilio's <code>IncomingPhoneNumbers.json</code> inventory API. Sarvam BYO Twilio requires an exclusive provisioned phone number ($1/mo on an upgraded Twilio account).
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

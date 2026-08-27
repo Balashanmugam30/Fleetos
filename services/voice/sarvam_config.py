@@ -18,10 +18,11 @@ class SarvamConfig(BaseModel):
     webhook_base_url: str = os.getenv("SARVAM_WEBHOOK_BASE_URL", os.getenv("VOICE_WEBHOOK_BASE_URL", "http://127.0.0.1:8000"))
     sarvam_tool_secret: str = os.getenv("SARVAM_TOOL_SECRET", "fleetos_sarvam_tool_sec_2026")
 
-    # Twilio Telephony Credentials
+    # Twilio Telephony Credentials & Number Provisioning Diagnostics
     twilio_account_sid: str = os.getenv("TWILIO_ACCOUNT_SID", "")
     twilio_auth_token: str = os.getenv("TWILIO_AUTH_TOKEN", "")
     twilio_phone_number: str = os.getenv("TWILIO_PHONE_NUMBER", "")
+    twilio_provisioned_number_count: int = int(os.getenv("TWILIO_PROVISIONED_NUMBER_COUNT", "0"))
 
     active_provider: str = os.getenv("VOICE_PROVIDER", os.getenv("ATLAS_PROVIDER", "sarvam")).lower()
 
@@ -34,12 +35,21 @@ class SarvamConfig(BaseModel):
         return bool(self.twilio_account_sid and self.twilio_auth_token and self.twilio_phone_number)
 
     @property
+    def is_sarvam_number_imported(self) -> bool:
+        return self.is_sarvam_configured and self.is_twilio_configured and self.twilio_provisioned_number_count > 0
+
+    @property
     def is_public_webhook_configured(self) -> bool:
         url = self.webhook_base_url.lower()
         return "trycloudflare.com" in url or "ngrok" in url or "https://" in url
 
     @property
     def is_real_pstn_ready(self) -> bool:
-        return self.is_sarvam_configured and self.is_twilio_configured and self.is_public_webhook_configured
+        return (
+            self.is_sarvam_configured
+            and self.is_twilio_configured
+            and self.is_sarvam_number_imported
+            and self.is_public_webhook_configured
+        )
 
 sarvam_config = SarvamConfig()

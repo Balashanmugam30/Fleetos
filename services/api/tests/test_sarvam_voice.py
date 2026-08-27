@@ -22,6 +22,17 @@ def test_sarvam_config_defaults():
     assert hasattr(sarvam_config, "is_real_pstn_ready")
     assert sarvam_config.sarvam_api_base_url == "https://api.sarvam.ai"
 
+def test_sarvam_health_diagnostics():
+    """Test Voice Health endpoint returns exact diagnostic fields for trial number limitations."""
+    resp = client.get("/api/v1/voice/health")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert "twilio_credentials_valid" in data
+    assert "twilio_trial_voice_available" in data
+    assert "twilio_provisioned_number_count" in data
+    assert "sarvam_number_imported" in data
+    assert "real_pstn_ready" in data
+
 def test_sarvam_tool_report_delay_endpoint():
     """Test POST /api/v1/voice/sarvam/tools/report-delay tool execution."""
     payload = {

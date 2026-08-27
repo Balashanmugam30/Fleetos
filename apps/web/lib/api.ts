@@ -202,6 +202,10 @@ export interface VoiceHealth {
   configured: boolean;
   sarvam_configured?: boolean;
   twilio_configured?: boolean;
+  twilio_credentials_valid?: boolean;
+  twilio_trial_voice_available?: boolean;
+  twilio_provisioned_number_count?: number;
+  sarvam_number_imported?: boolean;
   openai_configured?: boolean;
   public_webhook_configured?: boolean;
   websocket_configured?: boolean;

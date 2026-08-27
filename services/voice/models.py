@@ -55,6 +55,10 @@ class VoiceHealthResponse(BaseModel):
     configured: bool
     sarvam_configured: bool = False
     twilio_configured: bool = False
+    twilio_credentials_valid: bool = False
+    twilio_trial_voice_available: bool = False
+    twilio_provisioned_number_count: int = 0
+    sarvam_number_imported: bool = False
     openai_configured: bool = False
     public_webhook_configured: bool = False
     websocket_configured: bool = False

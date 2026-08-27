@@ -28,10 +28,10 @@ class VoiceService:
     def get_provider(self, requested_provider: Optional[str] = None) -> VoiceProvider:
         prov_name = (requested_provider or voice_config.active_provider).lower()
         if prov_name in ["sarvam", "real"]:
-            if sarvam_config.is_sarvam_configured:
+            if sarvam_config.is_real_pstn_ready:
                 return SarvamVoiceProvider()
             elif requested_provider in ["sarvam", "real"]:
-                raise ValueError("Sarvam Voice Agent credentials are not configured in .env (SARVAM_API_KEY required).")
+                raise ValueError("Sarvam Voice Agent is not PSTN ready. A provisioned Twilio phone number is required for Sarvam import.")
             return DemoVoiceProvider()
 
         elif prov_name == "twilio":
@@ -135,15 +135,23 @@ class VoiceService:
     def get_health(self) -> VoiceHealthResponse:
         is_sarvam_ok = sarvam_config.is_sarvam_configured
         is_twilio_ok = sarvam_config.is_twilio_configured
+        twilio_creds_valid = is_twilio_ok
+        twilio_trial_avail = bool(sarvam_config.twilio_phone_number)
+        prov_num_count = sarvam_config.twilio_provisioned_number_count
+        sarvam_imported = sarvam_config.is_sarvam_number_imported
         is_real = sarvam_config.is_real_pstn_ready
 
         base_url = sarvam_config.webhook_base_url.rstrip('/')
         return VoiceHealthResponse(
-            provider="sarvam" if is_sarvam_ok else "demo",
+            provider="sarvam" if is_real else "demo",
             mode="REAL" if is_real else "DEMO",
             configured=is_real,
             sarvam_configured=is_sarvam_ok,
             twilio_configured=is_twilio_ok,
+            twilio_credentials_valid=twilio_creds_valid,
+            twilio_trial_voice_available=twilio_trial_avail,
+            twilio_provisioned_number_count=prov_num_count,
+            sarvam_number_imported=sarvam_imported,
             openai_configured=bool(voice_config.is_openai_configured),
             public_webhook_configured=sarvam_config.is_public_webhook_configured,
             websocket_configured=True,

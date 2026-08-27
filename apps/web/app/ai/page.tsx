@@ -10,7 +10,7 @@ import {
   CallRecord,
   OperationalEvent
 } from "@/lib/api";
-import { PhoneCall, ShieldCheck, Globe, Activity, CheckCircle2, User, Truck } from "lucide-react";
+import { PhoneCall, ShieldCheck, Globe, Activity, CheckCircle2, AlertTriangle } from "lucide-react";
 
 export default function AIPage() {
   const [health, setHealth] = useState<VoiceHealth | null>(null);
@@ -65,6 +65,7 @@ export default function AIPage() {
   };
 
   const isRealMode = health?.mode === "REAL" && health?.configured;
+  const isTrialSandbox = health?.twilio_credentials_valid && (health?.twilio_provisioned_number_count === 0);
 
   return (
     <div className="space-y-6">
@@ -92,6 +93,19 @@ export default function AIPage() {
           </div>
         </div>
       </div>
+
+      {/* Trial Phone Sandbox Informational Alert */}
+      {isTrialSandbox && (
+        <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-xs space-y-1">
+          <div className="flex items-center space-x-2 font-bold text-amber-900">
+            <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+            <span>Twilio Trial Account Detected (IncomingPhoneNumbers = 0)</span>
+          </div>
+          <p className="text-amber-800 leading-relaxed pl-6">
+            Twilio "Try Out Voice" sandbox numbers cannot be imported into Sarvam Voice Agents because Twilio's Inventory API returns 0 provisioned phone numbers. Importing into Sarvam requires a provisioned Twilio phone number ($1/mo). Fleetos is running safely in <strong>Demo Telephony Mode</strong>.
+          </p>
+        </div>
+      )}
 
       {/* Driver Outbound Call Launcher Form */}
       <div className="logistics-card p-6 space-y-4">
@@ -177,7 +191,7 @@ export default function AIPage() {
 
           <div className="flex justify-between items-center pt-2">
             <span className="text-xs text-slate-400 font-mono">
-              Active Provider: SARVAM VOICE ({health?.mode || "DEMO"})
+              Active Provider: {isRealMode ? "SARVAM REAL VOICE" : "DEMO TELEPHONY MODE"}
             </span>
 
             <button

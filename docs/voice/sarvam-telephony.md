@@ -5,50 +5,56 @@ Voice Agent: **ATLAS**
 
 ---
 
-## Sarvam Voice Agents + Twilio Telephony Architecture
+## Twilio Trial Account Sandbox vs. Provisioned Phone Numbers
 
-To perform outbound PSTN voice calls to driver mobile phones, Fleetos integrates **Sarvam Voice Agents** with **Twilio Telephony**.
-
-### 1. Sarvam Dashboard Configuration (One-Time Setup)
-
-1. **Twilio Telephony Connection**:
-   - Navigate to **Sarvam Voice Agents Dashboard** $\rightarrow$ **Deploy** $\rightarrow$ **Phone Numbers** $\rightarrow$ **Add Connection**.
-   - Select **Twilio**.
-   - Enter your Twilio credentials:
-     - `Account SID`: `TWILIO_ACCOUNT_SID`
-     - `Auth Token`: `TWILIO_AUTH_TOKEN`
-   - Connect your Twilio Phone Number (`TWILIO_PHONE_NUMBER`).
-
-2. **ATLAS Voice Agent Assignment**:
-   - Assign the **ATLAS** logistics agent to the connected Twilio Phone Number.
-   - Configure System Prompt, Language (`Tamil`, `Hindi`, `English`, `AUTO`), and API Tool Endpoint:
-     - Tool Name: `report_delay`
-     - Tool Endpoint URL: `https://<your-public-tunnel-url>/api/v1/voice/sarvam/tools/report-delay`
-     - Authentication Header: `X-Sarvam-Tool-Secret: <SARVAM_TOOL_SECRET>`
-
-3. **Outbound Campaign / Agent Dispatch**:
-   - Copy your `Agent ID` (`SARVAM_AGENT_ID`), `Deployment ID` (`SARVAM_DEPLOYMENT_ID`), and `Campaign ID` (`SARVAM_CAMPAIGN_ID`) into `.env`.
+### 1. Twilio Trial Account Inventory Limitation
+When testing with a Twilio trial account:
+- Twilio provides a **"Try Out Voice" sandbox test number** (e.g., `+17372212163`) which can dial verified recipient phone numbers (`+91...`).
+- However, querying Twilio's REST API endpoint `GET /2010-04-01/Accounts/{SID}/IncomingPhoneNumbers.json` returns an **empty array** (`{"incoming_phone_numbers": []}`) because trial sandbox numbers are shared sandbox pools, not provisioned `IncomingPhoneNumber` resources belonging exclusively to the account.
+- When Sarvam Voice Agents executes **BYO Twilio $\rightarrow$ Import Numbers**, Sarvam queries `IncomingPhoneNumbers.json`. Because 0 provisioned numbers exist, Sarvam displays **"No results found"**.
 
 ---
 
-## Required Environment Variables in `.env`
+## Technical Prerequisites for Live Sarvam Outbound PSTN Calling
 
-```env
-# Sarvam Voice Agents API
-SARVAM_API_KEY=your_sarvam_api_key_here
-SARVAM_AGENT_ID=your_sarvam_agent_id
-SARVAM_DEPLOYMENT_ID=your_sarvam_deployment_id
-SARVAM_CAMPAIGN_ID=your_sarvam_campaign_id
-SARVAM_OUTBOUND_ENDPOINT=https://api.sarvam.ai/agents/your_agent_id/calls
-SARVAM_DEFAULT_LANGUAGE=hi-IN
-SARVAM_WEBHOOK_BASE_URL=https://inquire-shortly-independent-sheer.trycloudflare.com
-SARVAM_TOOL_SECRET=fleetos_sarvam_tool_sec_2026
+To connect a live phone number to Sarvam Voice Agents:
+1. **Twilio Account Upgrade**: Upgrade the Twilio account from trial status.
+2. **Provisioned Phone Number**: Purchase a dedicated Twilio phone number ($1/month).
+3. **Sarvam BYO Twilio Import**:
+   - Navigate to **Sarvam Voice Agents Dashboard** $\rightarrow$ **Deploy** $\rightarrow$ **Phone Numbers** $\rightarrow$ **Add Connection** $\rightarrow$ **Twilio**.
+   - Enter `TWILIO_ACCOUNT_SID` and `TWILIO_AUTH_TOKEN`.
+   - Select the provisioned Twilio phone number.
+4. **Environment Variables**:
+   ```env
+   TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   TWILIO_AUTH_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+   TWILIO_PHONE_NUMBER=+17372212163
+   TWILIO_PROVISIONED_NUMBER_COUNT=1
+   SARVAM_API_KEY=your_sarvam_api_key
+   SARVAM_AGENT_ID=your_sarvam_agent_id
+   SARVAM_DEPLOYMENT_ID=your_sarvam_deployment_id
+   SARVAM_CAMPAIGN_ID=your_sarvam_campaign_id
+   VOICE_PROVIDER=sarvam
+   ```
 
-# Twilio Telephony Ingress
-TWILIO_ACCOUNT_SID=your_twilio_account_sid
-TWILIO_AUTH_TOKEN=your_twilio_auth_token
-TWILIO_PHONE_NUMBER=+17372212163
+---
 
-# Active Voice Provider Flag
-VOICE_PROVIDER=sarvam
+## Fleetos Diagnostic Health Endpoint Behavior
+
+When running in trial mode without a provisioned phone number, `GET /api/v1/voice/health` returns:
+
+```json
+{
+  "provider": "demo",
+  "mode": "DEMO",
+  "configured": false,
+  "twilio_credentials_valid": true,
+  "twilio_trial_voice_available": true,
+  "twilio_provisioned_number_count": 0,
+  "sarvam_number_imported": false,
+  "outbound_ready": false,
+  "real_pstn_ready": false
+}
 ```
+
+Fleetos safely runs in **Demo Telephony Mode**, allowing full operational simulation, tool execution, and Control Tower updates without making false claims of real PSTN readiness.
