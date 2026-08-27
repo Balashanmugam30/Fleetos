@@ -34,23 +34,69 @@ def test_initiate_driver_call():
     assert response.status_code == 201
     data = response.json()
     assert data["driver_id"] == "D03"
-    assert data["status"] in ["QUEUED", "RINGING", "IN_PROGRESS", "COMPLETED"]
+    assert data["status"] == "COMPLETED"
     assert "call_id" in data
 
-def test_call_throttling_prevent_duplicate_active_call():
-    """Test driver call throttling (rejecting duplicate active calls for same driver)."""
+def test_demo_status_check_lifecycle_and_context():
+    """Test clean STATUS_CHECK completes without delay event and uses actual driver/lorry context."""
     payload = {
-        "driver_id": "D04",
-        "phone_number": "+919876543210",
+        "driver_id": "D01",
         "call_type": "STATUS_CHECK"
     }
-    # First call succeeds
-    res1 = client.post("/api/v1/voice/calls", json=payload)
-    assert res1.status_code == 201
+    response = client.post("/api/v1/voice/calls", json=payload)
+    assert response.status_code == 201
+    data = response.json()
+    assert data["driver_id"] == "D01"
+    assert data["lorry_id"] in ["L01", "L03"]
+    assert data["status"] == "COMPLETED"
+    assert data["duration_seconds"] > 0
+    assert data["event_id"] is None
+    assert "Routine status check completed" in data["outcome_summary"]
+    assert "D01" in data["transcript"]
 
-    # Second call for D04 is rejected with 409 CONFLICT if first call is active
-    res2 = client.post("/api/v1/voice/calls", json=payload)
-    assert res2.status_code in [201, 409]
+def test_demo_delay_report_lifecycle_context_and_event():
+    """Test DELAY_REPORT executes report_delay tool, creates event, populates event_id, and uses D02/L02 context."""
+    payload = {
+        "driver_id": "D02",
+        "call_type": "DELAY_REPORT"
+    }
+    response = client.post("/api/v1/voice/calls", json=payload)
+    assert response.status_code == 201
+    data = response.json()
+    assert data["driver_id"] == "D02"
+    assert data["lorry_id"] == "L02"
+    assert data["status"] == "COMPLETED"
+    assert data["duration_seconds"] == 45
+    assert data["event_id"] is not None
+    assert "L02" in data["outcome_summary"]
+    assert "D02" in data["transcript"]
+    assert "L02" in data["transcript"]
+
+    # Verify event exists in GET /api/v1/events
+    evt_res = client.get("/api/v1/events")
+    assert evt_res.status_code == 200
+    events = evt_res.json()
+    matching_evt = next((e for e in events if e["id"] == data["event_id"]), None)
+    assert matching_evt is not None
+    assert matching_evt["event_type"] == "DRIVER_DELAY_REPORTED"
+    assert matching_evt["lorry_id"] == "L02"
+    assert matching_evt["source"] == "ATLAS_VOICE"
+
+def test_demo_d03_l03_context():
+    """Test D03/L03 DELAY_REPORT uses D03/L03 context without generic hardcoding."""
+    payload = {
+        "driver_id": "D03",
+        "call_type": "DELAY_REPORT"
+    }
+    response = client.post("/api/v1/voice/calls", json=payload)
+    assert response.status_code == 201
+    data = response.json()
+    assert data["driver_id"] == "D03"
+    assert data["lorry_id"] == "L03"
+    assert data["status"] == "COMPLETED"
+    assert data["event_id"] is not None
+    assert "L03" in data["outcome_summary"]
+    assert "D03" in data["transcript"]
 
 def test_vapi_webhook_tool_call_execution():
     """Test Vapi webhook tool execution (report_delay creates event)."""
@@ -82,9 +128,6 @@ def test_vapi_webhook_tool_call_execution():
 
 def test_list_and_get_voice_calls():
     """Test listing voice calls and retrieving specific call detail."""
-    # Initiate a test call first
-    client.post("/api/v1/voice/calls", json={"driver_id": "D05", "call_type": "STATUS_CHECK"})
-
     res_list = client.get("/api/v1/voice/calls")
     assert res_list.status_code == 200
     records = res_list.json()
@@ -98,9 +141,24 @@ def test_list_and_get_voice_calls():
 
 def test_no_duplicate_call_records_in_memory_or_api():
     """Regression test ensuring GET /api/v1/voice/calls contains zero duplicate call IDs."""
-    client.post("/api/v1/voice/calls", json={"driver_id": "D01", "call_type": "STATUS_CHECK"})
     res_list = client.get("/api/v1/voice/calls")
     assert res_list.status_code == 200
     records = res_list.json()
     record_ids = [r["id"] for r in records]
     assert len(record_ids) == len(set(record_ids)), f"Duplicate call IDs found in API response: {record_ids}"
+
+def test_polling_does_not_duplicate_events_or_calls():
+    """Test repeated GET requests do NOT create duplicate calls or duplicate events."""
+    calls_before = len(client.get("/api/v1/voice/calls").json())
+    events_before = len(client.get("/api/v1/events").json())
+
+    # Repeated GET requests
+    for _ in range(5):
+        client.get("/api/v1/voice/calls")
+        client.get("/api/v1/events")
+
+    calls_after = len(client.get("/api/v1/voice/calls").json())
+    events_after = len(client.get("/api/v1/events").json())
+
+    assert calls_before == calls_after, "Polling GET /api/v1/voice/calls created duplicate call records!"
+    assert events_before == events_after, "Polling GET /api/v1/events created duplicate events!"

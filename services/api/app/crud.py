@@ -211,7 +211,16 @@ async def create_call(db: AsyncSession, call_data: schemas.CallCreate) -> models
         lorry_id=call_data.lorry_id,
         direction=call_data.direction,
         call_type=call_data.call_type,
-        status="QUEUED"
+        status=call_data.status or "COMPLETED",
+        started_at=call_data.started_at,
+        ended_at=call_data.ended_at,
+        transcript_reference=call_data.transcript,
+        event_id=call_data.event_id,
+        metadata_json={
+            "duration_seconds": call_data.duration_seconds or 0,
+            "outcome_summary": call_data.outcome_summary or "",
+            "phone_number": call_data.phone_number or ""
+        }
     )
     db.add(db_call)
     await db.commit()

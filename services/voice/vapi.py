@@ -21,7 +21,7 @@ class VapiVoiceProvider(VoiceProvider):
         self.phone_number_id = phone_number_id or voice_config.vapi_phone_number_id
         self.assistant_id = assistant_id or voice_config.vapi_assistant_id
 
-    def initiate_outbound_call(self, request: OutboundCallRequest, context: Dict[str, Any]) -> CallRecord:
+    async def initiate_outbound_call(self, request: OutboundCallRequest, context: Dict[str, Any], db: Optional[Any] = None) -> CallRecord:
         call_id = f"vapi_call_{uuid.uuid4().hex[:8]}"
         phone_number = request.phone_number or context.get("phone_number", "+919876543210")
         lorry_id = context.get("lorry_id", "L03")

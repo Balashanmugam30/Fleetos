@@ -210,7 +210,7 @@ export default function AIPage() {
                   <tr key={c.id} className="hover:bg-slate-50 transition-colors">
                     <td className="px-4 py-3 font-mono font-bold text-slate-900">{c.id}</td>
                     <td className="px-4 py-3 font-semibold">{c.driver_id}</td>
-                    <td className="px-4 py-3 font-semibold text-brand-600">{c.lorry_id || "L03"}</td>
+                    <td className="px-4 py-3 font-semibold text-brand-600">{c.lorry_id || (c.driver_id ? `L0${c.driver_id.slice(-1)}` : "L01")}</td>
                     <td className="px-4 py-3">{c.call_type}</td>
                     <td className="px-4 py-3 font-mono">{c.provider}</td>
                     <td className="px-4 py-3">

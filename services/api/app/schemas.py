@@ -221,6 +221,12 @@ class CallCreate(BaseModel):
     call_type: str = "STATUS_CHECK"
     status: Optional[str] = "QUEUED"
     phone_number: Optional[str] = None
+    event_id: Optional[str] = None
+    transcript: Optional[str] = None
+    outcome_summary: Optional[str] = None
+    duration_seconds: Optional[int] = 0
+    started_at: Optional[datetime.datetime] = None
+    ended_at: Optional[datetime.datetime] = None
 
 class CallResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)

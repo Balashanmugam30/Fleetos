@@ -9,7 +9,7 @@ from services.voice.models import OutboundCallRequest, CallRecord, CallStatus
 class VoiceProvider:
     """Abstract Telephony Provider Adapter."""
 
-    def initiate_outbound_call(self, request: OutboundCallRequest, context: Dict[str, Any]) -> CallRecord:
+    async def initiate_outbound_call(self, request: OutboundCallRequest, context: Dict[str, Any], db: Optional[Any] = None) -> CallRecord:
         raise NotImplementedError()
 
     def get_call_status(self, external_call_id: str) -> Optional[CallStatus]:

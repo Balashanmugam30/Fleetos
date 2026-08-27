@@ -48,8 +48,11 @@ class VoiceService:
 
         if db:
             driver = await crud.get_driver(db, d_id)
-            if driver and driver.phone_number:
-                phone_number = driver.phone_number
+            if driver:
+                if driver.phone_number:
+                    phone_number = driver.phone_number
+                if driver.current_lorry_id:
+                    lorry_id = driver.current_lorry_id
 
         context = {
             "driver_id": d_id,
@@ -59,7 +62,7 @@ class VoiceService:
         }
 
         active_prov = self.get_provider(provider_name)
-        call_record = active_prov.initiate_outbound_call(request, context)
+        call_record = await active_prov.initiate_outbound_call(request, context, db=db)
 
         # Store in local record memory under canonical call_record.id
         self._call_records[call_record.id] = call_record
@@ -72,11 +75,16 @@ class VoiceService:
                 from services.api.app.schemas import CallCreate
                 call_create = CallCreate(
                     id=call_record.id,
+                    provider=call_record.provider,
                     driver_id=d_id,
                     lorry_id=lorry_id,
                     call_type=request.call_type.value,
                     status=call_record.status.value,
-                    phone_number=phone_number
+                    phone_number=phone_number,
+                    event_id=call_record.event_id,
+                    transcript=call_record.transcript,
+                    outcome_summary=call_record.outcome_summary,
+                    duration_seconds=call_record.duration_seconds
                 )
                 db_rec = await crud.create_call(db, call_create)
                 if db_rec.id != call_record.id:

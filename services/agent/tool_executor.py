@@ -95,7 +95,7 @@ class ToolExecutor:
         }
 
     async def _report_delay(self, arguments: Dict[str, Any], db: Optional[AsyncSession] = None) -> Dict[str, Any]:
-        lorry_id = str(arguments.get("lorry_id", "L03")).upper().strip()
+        lorry_id = str(arguments.get("lorry_id", "L01")).upper().strip()
         try:
             delay_minutes = int(arguments.get("delay_minutes", 45))
         except (ValueError, TypeError):
@@ -143,7 +143,7 @@ class ToolExecutor:
         }
 
     async def _report_breakdown(self, arguments: Dict[str, Any], db: Optional[AsyncSession] = None) -> Dict[str, Any]:
-        lorry_id = str(arguments.get("lorry_id", "L03")).upper().strip()
+        lorry_id = str(arguments.get("lorry_id", "L01")).upper().strip()
         description = str(arguments.get("description", "Vehicle engine breakdown reported by driver.")).strip()
         event_id = f"evt_{uuid.uuid4().hex[:8]}"
 
