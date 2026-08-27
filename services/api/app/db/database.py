@@ -16,7 +16,7 @@ if DATABASE_URL.startswith("postgresql://"):
 
 engine_kwargs = {}
 if DATABASE_URL.startswith("sqlite"):
-    engine_kwargs["connect_args"] = {"check_same_thread": False}
+    engine_kwargs["connect_args"] = {"check_same_thread": False, "timeout": 15.0}
 
 async_engine = create_async_engine(DATABASE_URL, echo=False, **engine_kwargs)
 

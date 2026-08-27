@@ -61,7 +61,7 @@ class VoiceService:
         active_prov = self.get_provider(provider_name)
         call_record = active_prov.initiate_outbound_call(request, context)
 
-        # Store in local record memory
+        # Store in local record memory under canonical call_record.id
         self._call_records[call_record.id] = call_record
         if call_record.status in [CallStatus.QUEUED, CallStatus.RINGING, CallStatus.IN_PROGRESS]:
             self._active_driver_calls[d_id] = call_record.id
@@ -71,6 +71,7 @@ class VoiceService:
             try:
                 from services.api.app.schemas import CallCreate
                 call_create = CallCreate(
+                    id=call_record.id,
                     driver_id=d_id,
                     lorry_id=lorry_id,
                     call_type=request.call_type.value,
@@ -78,15 +79,21 @@ class VoiceService:
                     phone_number=phone_number
                 )
                 db_rec = await crud.create_call(db, call_create)
-                call_record.id = db_rec.id
-                self._call_records[db_rec.id] = call_record
+                if db_rec.id != call_record.id:
+                    old_id = call_record.id
+                    self._call_records.pop(old_id, None)
+                    call_record.id = db_rec.id
+                    self._call_records[db_rec.id] = call_record
             except Exception as err:
                 print(f"Warning: Failed to persist CallRecord to DB: {err}")
 
         return call_record
 
     def get_call_records(self, limit: int = 50) -> List[CallRecord]:
-        records = list(self._call_records.values())
+        deduped: Dict[str, CallRecord] = {}
+        for r in self._call_records.values():
+            deduped[r.id] = r
+        records = list(deduped.values())
         records.sort(key=lambda r: r.created_at, reverse=True)
         return records[:limit]
 

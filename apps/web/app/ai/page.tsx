@@ -30,8 +30,11 @@ export default function AIPage() {
         fetchCallRecords(20),
         fetchEvents()
       ]);
+      const dedupedCalls = (cRes || []).filter((call, index, self) =>
+        index === self.findIndex((t) => t.id === call.id)
+      );
       setHealth(hRes);
-      setCallRecords(cRes);
+      setCallRecords(dedupedCalls);
       setEvents(eRes.filter(e => e.source === "ATLAS_VOICE" || e.event_type.includes("CALL") || e.event_type.includes("DELAY")));
     } catch (err) {
       console.error("Error loading ATLAS Voice Operations data:", err);

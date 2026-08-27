@@ -95,3 +95,12 @@ def test_list_and_get_voice_calls():
     res_detail = client.get(f"/api/v1/voice/calls/{target_id}")
     assert res_detail.status_code == 200
     assert res_detail.json()["id"] == target_id
+
+def test_no_duplicate_call_records_in_memory_or_api():
+    """Regression test ensuring GET /api/v1/voice/calls contains zero duplicate call IDs."""
+    client.post("/api/v1/voice/calls", json={"driver_id": "D01", "call_type": "STATUS_CHECK"})
+    res_list = client.get("/api/v1/voice/calls")
+    assert res_list.status_code == 200
+    records = res_list.json()
+    record_ids = [r["id"] for r in records]
+    assert len(record_ids) == len(set(record_ids)), f"Duplicate call IDs found in API response: {record_ids}"
